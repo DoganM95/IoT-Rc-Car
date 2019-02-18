@@ -4,6 +4,8 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "chalk": "^2.4.2",
+    "commander": "^2.19.0",
     "onoff": "^3.2.7",
     "socket.io": "^2.2.0"
   },
