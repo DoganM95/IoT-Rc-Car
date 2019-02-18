@@ -1,0 +1,9 @@
+Raspberry Pi and Node.js LED and Button Script
+
+This Chapter intents to let the GPIO4 go on and off (using an led attached to GPIO4 && GND)
+
+GPIO Pins:
+
+5V() -> PiCell(1, 2) -> PhysicalPin(2)
+GPIO17() -> PiCell(6,1) -> PhysicalPin(11)
+
