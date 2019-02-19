@@ -8,7 +8,7 @@ var Gpio = require('onoff').Gpio; //https://www.npmjs.com/package/onoff#class-gp
 //GPIO Objects
 var motor = new Gpio(4, 'out'); //use GPIO pin 4 as output
 
-http.listen(8000); //listen to port 8080
+http.listen(8080); //listen to port 8080
 
 function handler (req, res) { //create server
   fs.readFile(__dirname + '/index.html', function(err, data) { //read file index.html in public folder
