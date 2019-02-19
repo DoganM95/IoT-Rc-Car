@@ -1,0 +1,9 @@
+Node.js Raspberry Pi GPIO - Blinking LED
+
+This Chapter intents to let the GPIO4 go on and off (using an led attached to GPIO4 && GND)
+
+GPIO Pins:
+
+GPIO(4) -> PiCell(4, 1) -> PhysicalPin(7)
+GND() -> PiCell(5,1) -> PhysicalPin(9)
+
