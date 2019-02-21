@@ -3,16 +3,15 @@ let https = require('https').createServer(handler); //NEEDS FIX
 var fs = require('fs'); //require filesystem module
 var io = require('socket.io')(http) //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
 var Gpio = require('onoff').Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
-let pigpio = require('pigpio').Gpio;
-
+let pigpio = require('pigpio').Gpio; //https://www.npmjs.com/package/pigpio#servo-control // include pigpio to enable pulse width modulation for servo
 
 //GPIO Objects
 let motor = new Gpio(4, 'out'); //use GPIO pin 4 as output
-let servo = new pigpio(18, {mode: pigpio.OUTPUT})
-
+// let servo = new Gpio(18, 'out'); //use GPIO pin 4 as output
+let servo = new pigpio(18, {mode: pigpio.OUTPUT});
 
 //Reset Pins to low - Init
-servo.digitalWrite(0);
+servo.writeSync(0);
 
 //Server
 http.listen(8080); //listen to port 8080
