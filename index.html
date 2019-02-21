@@ -8,13 +8,20 @@
 
 <body>
     <h1>First run</h1>
-    <button id="motorState">Run Da Motor</button> <!-- listen per eventlistener on any events -->
+    <div id="buttons">
+        <button id="motorState">Run Da Motor</button> <!-- listen per eventlistener on any events -->
+        <button id="servoLeftButton">Turn Servo Left</button>
+        <button id="servoRightButton">Turn Servo Right</button>
+    </div>
+
 
     <script>
         var socket = io(); //load socket.io-client and connect to the host that serves the page
 
         window.addEventListener("load", function () { //when page loads
             let motor = document.getElementById("motorState");
+            let servoLeftElement = document.getElementById("servoLeftButton");
+            let servoRightElement = document.getElementById("servoRightButton");
 
             //Event Listeners:
             motor.addEventListener("mousedown", function () { //add event listener for when checkbox changes
@@ -22,6 +29,12 @@
             });
             motor.addEventListener("mouseup", function () {
                 socket.emit("motorSocket", 0); //send motor-stop action (== 0)
+            });
+            servoLeftElement.addEventListener("click", function () {
+                socket.emit("servoSocket", 1);
+            });
+            servoRightElement.addEventListener("click", function () {
+                socket.emit("servoSocket", 0);
             });
 
         });

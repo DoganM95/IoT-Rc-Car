@@ -3,11 +3,18 @@ let https = require('https').createServer(handler); //NEEDS FIX
 var fs = require('fs'); //require filesystem module
 var io = require('socket.io')(http) //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
 var Gpio = require('onoff').Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
+let pigpio = require('pigpio').Gpio;
 
 
 //GPIO Objects
-var motor = new Gpio(4, 'out'); //use GPIO pin 4 as output
+let motor = new Gpio(4, 'out'); //use GPIO pin 4 as output
+let servo = new pigpio(18, {mode: pigpio.OUTPUT})
 
+
+//Reset Pins to low - Init
+servo.digitalWrite(0);
+
+//Server
 http.listen(8080); //listen to port 8080
 
 function handler (req, res) { //create server
@@ -28,6 +35,9 @@ function handler (req, res) { //create server
 io.sockets.on('connection', function (socket) {// WebSocket Connection
   socket.on('motorSocket', (data) => {
     motor.writeSync(data);
+  });
+  socket.on("servoSocket", function(data){
+    servo.writeSync(data);
   })
 });
 
@@ -35,5 +45,7 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
 process.on('SIGINT', function () { //on ctrl+c
   motor.writeSync(0); // Turn LED off
   motor.unexport(); // Unexport LED GPIO to free resources
+  servo.writeSync(0); // Turn LED off
+  servo.unexport(); // Unexport LED GPIO to free resources
   process.exit(); //exit completely
 });
