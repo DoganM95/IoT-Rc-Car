@@ -1,8 +1,0 @@
-ports, that need to be forwarded for this project:
-
-21 - FTP
-22 - SSH
-80 - web
-2121 - fallback ftp
-5900 - VNC
-8080 - webserver
