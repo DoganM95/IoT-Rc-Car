@@ -15,7 +15,6 @@
         <button id="servoRightButton">Turn Servo Right</button>
     </div>
 
-
     <script>
         var socket = io(); //load socket.io-client and connect to the host that serves the page
 
@@ -23,24 +22,49 @@
             let motor = document.getElementById("motorState");
             let servoLeftElement = document.getElementById("servoLeftButton");
             let servoRightElement = document.getElementById("servoRightButton");
+            let motorSpeed = 0;
+            let motorSpeedIncrement = 5;
 
             //Event Listeners:
-            motor.addEventListener("mousedown", function () { //add event listener for when checkbox changes
-                socket.emit("motorSocket", 1); //send motor-run action (== 1)
+            motor.addEventListener("mousedown", function () { //when button is pressed
+                socket.emit("motorSocket", 255); //send motor-run action (on)
             });
-            motor.addEventListener("mouseup", function () {
-                socket.emit("motorSocket", 0); //send motor-stop action (== 0)
+            motor.addEventListener("mouseup", function () { //when mouse is released
+                socket.emit("motorSocket", 0); //send motor-stop action (off)
             });
-            servoLeftElement.addEventListener("click", function () {
-                socket.emit("servoSocket", 1);
+            servoLeftElement.addEventListener("click", function () { //when button is clicked
+                socket.emit("servoSocket", 2500); //turn servo most-clockwise
             });
-            servoRightElement.addEventListener("click", function () {
-                socket.emit("servoSocket", 0);
+            servoRightElement.addEventListener("click", function () { //when button is clicked
+                socket.emit("servoSocket", 500); //turn servo most anti-clockwise
             });
-            document.addEventListener("keypress", (key) => {
-                console.log("Key: " + key.keyCode + "pressed.")
+            socket.on("motorSpeed", (data) => { //when motor-speed changes, receive the speed via socket 
+                motorSpeed = data; //set motorSpeed's value to the current speed
+                console.log("received current motorSpeed via socket: " + motorSpeed);
             })
-
+            document.addEventListener("keypress", (key) => { //Keypress Event listener
+                console.log("Key: " + key.keyCode + "pressed."); //log the pressed key
+                switch (key.keyCode) { //switch statement for pressed key
+                    case 50: //corresponds to Key "2" in dpad
+                        if (motorSpeed > 0) {
+                            socket.emit("motorSocket", (motorSpeed - motorSpeedIncrement)); //increase motorSpeed by motorSpeedIncrement's value
+                        }
+                        break;
+                    case 56: //corresponds to Key "8" in dpad
+                        if (motorSpeed < 255) {
+                            socket.emit("motorSocket", (motorSpeed + motorSpeedIncrement)); //decrease motorSpeed by motorSpeedIncrement's value
+                        }
+                        break;
+                    case 53: //corresponds to Key "5" in dpad
+                        if (motorSpeed > 0) {
+                            socket.emit("motorSocket", 0); //stops motor, if motor is running
+                        }
+                        if (motorSpeed == 0) {
+                            socket.emit("motorSocket", 255); //max-speeds motor, if it was off
+                        }
+                        break;
+                }
+            })
         });
     </script>
 </body>
