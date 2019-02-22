@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <!-- include socket.io client side script -->
 </head>
@@ -36,7 +37,7 @@
             servoRightElement.addEventListener("click", function () {
                 socket.emit("servoSocket", 0);
             });
-            document.addEventListener("keypress", (key)=>{
+            document.addEventListener("keypress", (key) => {
                 console.log("Key: " + key.keyCode + "pressed.")
             })
 
