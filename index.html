@@ -36,6 +36,9 @@
             servoRightElement.addEventListener("click", function () {
                 socket.emit("servoSocket", 0);
             });
+            document.addEventListener("keypress", (key)=>{
+                console.log("Key: " + key.keyCode + "pressed.")
+            })
 
         });
     </script>

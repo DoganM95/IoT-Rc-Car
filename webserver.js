@@ -11,7 +11,7 @@ let motor = new Gpio(4, 'out'); //use GPIO pin 4 as output
 let servo = new pigpio(18, {mode: pigpio.OUTPUT});
 
 //Reset Pins to low - Init
-servo.writeSync(0);
+servo.servoWrite(0);
 
 //Server
 http.listen(8080); //listen to port 8080
