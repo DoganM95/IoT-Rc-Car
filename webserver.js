@@ -11,7 +11,7 @@ let motor = new pigpio(4, {mode: pigpio.OUTPUT}); //use GPIO pin 4 as output
 let servo = new pigpio(18, {mode: pigpio.OUTPUT});
 
 //Reset Pins to low - Init
-servo.servoWrite(0);
+servo.servoWrite(1500);
 motor.pwmWrite(0);
 
 //Server
@@ -35,13 +35,17 @@ function handler (req, res) { //create server
 
 //Server Socket listener
 io.sockets.on('connection', function (socket) {// WebSocket Connection
+
   socket.on('motorSocket', (data) => { //when motorSocket receives data from client
     motor.pwmWrite(data); //set motor-speed
-    socket.emit("motorSpeed", motor.getPwmDutyCycle()); //emit motorSpeed to client-side to keep client updated about motors current speed
+    socket.emit("motorSpeedSocket", motor.getPwmDutyCycle()); //emit motorSpeed to client-side to keep client updated about motors current speed
   });
-  socket.on("servoSocket", function(data){ //when servo receives data from client
-    servo.servoWrite(data); //set servo-direction
-  })
+
+  socket.on("servoSocket", (data) => {
+    servo.servoWrite(data);
+    socket.emit("servoAngleSocket", servo.getServoPulseWidth());
+  });
+
 });
 
 //Event Listener
