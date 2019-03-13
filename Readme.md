@@ -45,3 +45,8 @@ D-Pad:
 | ------------- |:-------------:| -----:|
 | 37: steer left <br>(== number 4 in dpad) | 53: drive full-speed or stop <br>(== number 5 in dpad) | 39: steer right <br>(== number 6 in dpad) |
 | | 40: drive backwards <br>(== number 2 in dpad) | |
+
+
+## Manifest.json possible Values:
+    "display":      ["fullscreen", "standalone", "minimal-ui", "browser"]  
+    "orientation":  ["landscape", "portrait"]
