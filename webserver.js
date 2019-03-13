@@ -9,6 +9,9 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 //GPIO Objects
 let motor = new pigpio(4, {mode: pigpio.OUTPUT}); //use GPIO pin 4 as output
 let servo = new pigpio(18, {mode: pigpio.OUTPUT});
+//Future
+let engineLeftSpeed = new pigpio(17, {mode: pigpio.OUTPUT});
+let engineRightSpeed = new pigpio(16, {mode: pigpio.OUTPUT});
 
 //Reset Pins to low - Init
 servo.servoWrite(1500);

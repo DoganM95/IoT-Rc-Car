@@ -18,6 +18,7 @@
 
     <script>
         var socket = io(); //load socket.io-client and connect to the host that serves the page
+        socket.emit("servoSocket", 1500); //initially center servo
 
         window.addEventListener("load", function () { //when page loads
             let motor = document.getElementById("motorState");
@@ -48,6 +49,7 @@
                 motorSpeed = data; //set motorSpeed's value to the current speed
                 console.log("received current motorSpeed via socket: " + motorSpeed);
             });
+
             socket.on("servoAngleSocket", (data) => {
                 servoAngle = data;
                 console.log("received current servoAngle via Socket: " + servoAngle);
@@ -97,44 +99,44 @@
 
         //Chrome sensoring tests
 
-        Promise.all([navigator.permissions.query({ name: "accelerometer" }),
-        navigator.permissions.query({ name: "magnetometer" }),
-        navigator.permissions.query({ name: "gyroscope" })])
-            .then(results => {
-                if (results.every(result => result.state === "granted")) {
-                    const options = { frequency: 60, referenceFrame: 'device' };
-                    const sensor = new AbsoluteOrientationSensor(options);
+        // Promise.all([navigator.permissions.query({ name: "accelerometer" }),
+        // navigator.permissions.query({ name: "magnetometer" }),
+        // navigator.permissions.query({ name: "gyroscope" })])
+        //     .then(results => {
+        //         if (results.every(result => result.state === "granted")) {
+        //             const options = { frequency: 60, referenceFrame: 'device' };
+        //             const sensor = new AbsoluteOrientationSensor(options);
 
-                    sensor.addEventListener('reading', () => {
-                        // model is a Three.js object instantiated elsewhere.
-                        model.quaternion.fromArray(sensor.quaternion).inverse();
-                    });
-                    sensor.AddEventListener('error', error => {
-                        if (event.error.name == 'NotReadableError') {
-                            console.log("Sensor is not available.");
-                        }
-                    });
-                    sensor.start();
+        //             sensor.addEventListener('reading', () => {
+        //                 // model is a Three.js object instantiated elsewhere.
+        //                 model.quaternion.fromArray(sensor.quaternion).inverse();
+        //             });
+        //             sensor.AddEventListener('error', error => {
+        //                 if (event.error.name == 'NotReadableError') {
+        //                     console.log("Sensor is not available.");
+        //                 }
+        //             });
+        //             sensor.start();
 
-                } else {
-                    console.log("No permissions to use AbsoluteOrientationSensor.");
-                }
-            });
+        //         } else {
+        //             console.log("No permissions to use AbsoluteOrientationSensor.");
+        //         }
+        //     });
 
 
-        // Update mesh rotation using quaternion.
-        const sensorAbs = new AbsoluteOrientationSensor();
-        sensorAbs.onreading = () => torus.quaternion.fromArray(sensorAbs.quaternion);
-        sensorAbs.start();
+        // // Update mesh rotation using quaternion.
+        // const sensorAbs = new AbsoluteOrientationSensor();
+        // sensorAbs.onreading = () => torus.quaternion.fromArray(sensorAbs.quaternion);
+        // sensorAbs.start();
 
-        // Update mesh rotation using rotation matrix.
-        const sensorRel = new RelativeOrientationSensor();
-        let rotationMatrix = new Float32Array(16);
-        sensor_rel.onreading = () => {
-            sensorRel.populateMatrix(rotationMatrix);
-            torus.matrix.fromArray(rotationMatrix);
-        }
-        sensorRel.start();
+        // // Update mesh rotation using rotation matrix.
+        // const sensorRel = new RelativeOrientationSensor();
+        // let rotationMatrix = new Float32Array(16);
+        // sensor_rel.onreading = () => {
+        //     sensorRel.populateMatrix(rotationMatrix);
+        //     torus.matrix.fromArray(rotationMatrix);
+        // }
+        // sensorRel.start();
     </script>
 </body>
 
