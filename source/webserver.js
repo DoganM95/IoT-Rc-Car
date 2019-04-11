@@ -49,6 +49,8 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
     socket.emit("servoAngleSocket", servo.getServoPulseWidth());
   });
 
+  // motor.pwmRange(30);
+
 });
 
 //Event Listener
