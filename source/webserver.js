@@ -7,7 +7,8 @@ let pigpio = require('pigpio').Gpio; //https://www.npmjs.com/package/pigpio#serv
 let three = require("three"); //https://www.npmjs.com/package/three //
 
 //GPIO Objects
-let motor = new pigpio(4, {mode: pigpio.OUTPUT}); //use GPIO pin 4 as output
+let motorLeft = new pigpio(4, {mode: pigpio.OUTPUT}); //use GPIO pin 4 as output
+let motorRight = new pigpio(4, {mode: pigpio.OUTPUT}); //use GPIO pin 4 as output
 let servo = new pigpio(18, {mode: pigpio.OUTPUT});
 //Future
 let engineLeftSpeed = new pigpio(17, {mode: pigpio.OUTPUT});
@@ -15,10 +16,11 @@ let engineRightSpeed = new pigpio(16, {mode: pigpio.OUTPUT});
 
 //Reset Pins to low - Init
 servo.servoWrite(1500);
-motor.pwmWrite(0);
+motorLeft.pwmWrite(0);
 
 //Server
 http.listen(8080); //listen to port 8080
+console.log("webserver up and running.")
 
 function handler (req, res) { //create server
   fs.readFile(__dirname + '/index.html', function(err, data) { //read file index.html in public folder
@@ -39,9 +41,9 @@ function handler (req, res) { //create server
 //Server Socket listener
 io.sockets.on('connection', function (socket) {// WebSocket Connection
 
-  socket.on('motorSocket', (data) => { //when motorSocket receives data from client
-    motor.pwmWrite(data); //set motor-speed
-    socket.emit("motorSpeedSocket", motor.getPwmDutyCycle()); //emit motorSpeed to client-side to keep client updated about motors current speed
+  socket.on('motorLeftSocket', (data) => { //when motorLeftSocket receives data from client
+    motorLeft.pwmWrite(data); //set motorLeft-speed
+    socket.emit("motorLeftSpeedSocket", motorLeft.getPwmDutyCycle()); //emit motorLeftSpeed to client-side to keep client updated about motorLefts current speed
   });
 
   socket.on("servoSocket", (data) => {
@@ -49,13 +51,13 @@ io.sockets.on('connection', function (socket) {// WebSocket Connection
     socket.emit("servoAngleSocket", servo.getServoPulseWidth());
   });
 
-  // motor.pwmRange(30);
+  // motorLeft.pwmRange(30);
 
 });
 
 //Event Listener
 process.on('SIGINT', function () { //on ctrl+c
-  motor.pwmWrite(0); // Turn motor off
+  motorLeft.pwmWrite(0); // Turn motorLeft off
   servo.servoWrite(1500); // center steering
   process.exit(); //exit completely
 });
