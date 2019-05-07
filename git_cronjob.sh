@@ -1,6 +1,6 @@
-echo hi;
-git --version;
-PROJECT_PATH="/home/pi/Project/RaspberryPi_RC-Car/";
+echo hi &&
+git --version &&
+PROJECT_PATH="/home/pi/Project/RaspberryPi_RC-Car/" &&
 echo $PROJECT_PATH &&
 git fetch $PROJECT_PATH &&
 git pull $PROJECT_PATH &&
