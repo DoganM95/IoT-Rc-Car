@@ -4,24 +4,24 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
-    "chalk": "^2.4.2",
-    "commander": "^2.19.0",
+    "chalk": "2.4.2",
+    "commander": "^2.20.0",
     "http": "0.0.0",
-    "onoff": "^3.2.7",
-    "pigpio": "^1.2.1",
-    "socket.io": "^2.2.0",
-    "three": "^0.101.1"
+    "onoff": "^3.2.9",
+    "pigpio": "1.2.2",
+    "socket.io": "2.2.0",
+    "three": "0.101.1"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node \\home\\pi\\Project\\RaspberryPi_RC-Car\\source\\webserver.js"
+    "start": "sudo node \\home\\pi\\Project\\RaspberryPi_RC-Car\\src\\main\\javascript\\webserver.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://DoganM95:e8JV3C8!@github.com/DoganM95/RaspberryPi_RC-Car.git"
+    "url": "git+https://github.com/DoganM95/RaspberryPi_RC-Car.git"
   },
-  "author": "",
+  "author": "Dogan",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/DoganM95/RaspberryPi_RC-Car/issues"
