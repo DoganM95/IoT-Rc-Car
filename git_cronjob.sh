@@ -6,4 +6,4 @@ git fetch $PROJECT_PATH &&
 git pull $PROJECT_PATH &&
 git add $PROJECT_PATH &&
 git commit -m "autosaved all changes via chronjob on pi" &&
-git push 
+git push $PROJECT_PATH
