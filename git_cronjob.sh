@@ -5,4 +5,4 @@ git fetch &&
 git pull &&
 git add . &&
 git commit -m "autosaved all changes via chronjob on pi" &&
-git push
+git push origin master
