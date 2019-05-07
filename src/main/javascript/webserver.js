@@ -93,6 +93,10 @@ const steering = {
   leftServo: servoLeft,
   rightServo: servoRight,
 
+  center(){
+    leftServo.servoWrite
+  }
+
   writeServos (rotation){
     Object.keys(this).forEach(servo => {
       if(rotation > 2500){
