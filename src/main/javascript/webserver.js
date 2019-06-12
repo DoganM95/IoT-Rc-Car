@@ -30,12 +30,12 @@ let client;
 //Mains
 //-----------------------------------------------------------------------------
 
-async function main(){
+(async() => {
 
 //Reset Pins to low - Init
 // servos.writeServosProto();
 // steering.writeServos(1500);
-steering.leftServo.servoWrite(1500);
+steering.leftServo.servoWrite(1000);
 steering.rightServo.servoWrite(1500);
 motorLeft.pwmWrite(0);
 
@@ -81,7 +81,7 @@ process.on('SIGINT', function () { //on ctrl+c
   process.exit(); //exit completely
 });
 
-};
+})();
 
 
 
@@ -92,10 +92,6 @@ process.on('SIGINT', function () { //on ctrl+c
 const steering = {
   leftServo: servoLeft,
   rightServo: servoRight,
-
-  center(){
-    leftServo.servoWrite
-  }
 
   writeServos (rotation){
     Object.keys(this).forEach(servo => {
@@ -181,8 +177,3 @@ function handler (req, res) { //create server
     }
   });
 }
-
-//-----------------------------------------------------------------------------
-//Main Call
-//-----------------------------------------------------------------------------
-main();
