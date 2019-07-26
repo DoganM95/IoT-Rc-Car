@@ -1,0 +1,3 @@
+cd ..
+cd javascript
+sudo nodejs start webserver.js
