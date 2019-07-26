@@ -29,61 +29,69 @@ let client;
 //-----------------------------------------------------------------------------
 
 (async () => {
-  //Reset Pins to low - Init
-  // servos.writeServosProto();
-  // steering.writeServos(1500);
-  // steering.leftServo.servoWrite(1000);
-  // steering.rightServo.servoWrite(1500);
-  motorLeft.pwmWrite(0);
+  let i = 0;
+  while (true) {
+    setTimeout(function() {
+      console.log(i);
+      i++;
+    }, 1);
+  }
 
-  //Server Socket listener
-  io.sockets.on("connection", function(socket) {
-    // WebSocket Connection
+  // //Reset Pins to low - Init
+  // // servos.writeServosProto();
+  // // steering.writeServos(1500);
+  // // steering.leftServo.servoWrite(1000);
+  // // steering.rightServo.servoWrite(1500);
+  // motorLeft.pwmWrite(0);
 
-    socket.on("connection"),
-      identityObject => {
-        client = identityObject;
-      };
+  // //Server Socket listener
+  // io.sockets.on("connection", function(socket) {
+  //   // WebSocket Connection
 
-    socket.on("motorLeftSocket", data => {
-      //when motorLeftSocket receives data from client
-      motorLeft.pwmWrite(data); //set motorLeft-speed
-      socket.emit("motorLeftSpeedSocket", motorLeft.getPwmDutyCycle()); //emit motorLeftSpeed to client-side to keep client updated about motorLefts current speed
-    });
+  //   socket.on("connection"),
+  //     identityObject => {
+  //       client = identityObject;
+  //     };
 
-    socket.on("servoSocket", data => {
-      //entry point for servo writes
+  //   socket.on("motorLeftSocket", data => {
+  //     //when motorLeftSocket receives data from client
+  //     motorLeft.pwmWrite(data); //set motorLeft-speed
+  //     socket.emit("motorLeftSpeedSocket", motorLeft.getPwmDutyCycle()); //emit motorLeftSpeed to client-side to keep client updated about motorLefts current speed
+  //   });
 
-      //TODO: place algorithm here to sync servo angles
-      steering.leftServo.servoWrite(data);
-      steering.rightServo.servoWrite(data);
+  //   socket.on("servoSocket", data => {
+  //     //entry point for servo writes
 
-      socket.emit(
-        "leftServoAngleSocket",
-        steering.leftServo.getServoPulseWidth()
-      );
-      socket.emit(
-        "rightServoAngleSocket",
-        steering.rightServo.getServoPulseWidth()
-      );
-    });
+  //     //TODO: place algorithm here to sync servo angles
+  //     steering.leftServo.servoWrite(data);
+  //     steering.rightServo.servoWrite(data);
 
-    // motorLeft.pwmRange(30);
-  });
+  //     socket.emit(
+  //       "leftServoAngleSocket",
+  //       steering.leftServo.getServoPulseWidth()
+  //     );
+  //     socket.emit(
+  //       "rightServoAngleSocket",
+  //       steering.rightServo.getServoPulseWidth()
+  //     );
+  //   });
 
-  //Server
-  http.listen(8080); //listen to port 8080
-  console.log("waiting for connection on web-interface.");
+  //   // motorLeft.pwmRange(30);
+  // });
 
-  //Event Listener
-  process.on("SIGINT", function() {
-    //on ctrl+c
-    console.log("killing server.");
-    motorLeft.pwmWrite(0); // Turn motorLeft off
-    steering.leftServo.servoWrite(1500);
-    steering.rightServo.servoWrite(1500); // center steering
-    process.exit(); //exit completely
-  });
+  // //Server
+  // http.listen(8080); //listen to port 8080
+  // console.log("waiting for connection on web-interface.");
+
+  // //Event Listener
+  // process.on("SIGINT", function() {
+  //   //on ctrl+c
+  //   console.log("killing server.");
+  //   motorLeft.pwmWrite(0); // Turn motorLeft off
+  //   steering.leftServo.servoWrite(1500);
+  //   steering.rightServo.servoWrite(1500); // center steering
+  //   process.exit(); //exit completely
+  // });
 })();
 
 //-----------------------------------------------------------------------------
