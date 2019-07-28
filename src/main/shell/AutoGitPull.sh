@@ -13,6 +13,10 @@ timestamp() {
  ERROR='\033[0;31m'
 
 while :; do
+    cd /home/pi/Project/RaspberryPi_RC-Car/
+    pwd
+    git checkout master
+    git fetch   ; echo "exit code: ${?}"
     UPSTREAM=${1:-'@{u}'}
     LOCAL=$(git rev-parse @)
     REMOTE=$(git rev-parse "$UPSTREAM")
@@ -36,7 +40,5 @@ else
     # Changes
     echo "third script found no changes"
 fi
-
-
     sleep 1
 done
