@@ -37,7 +37,7 @@ while :; do
     BASE=$(git merge-base @ "$UPSTREAM")
 
     if [ $LOCAL = $REMOTE ]; then
-        echo $(timestamp) "Up-to-date"
+        # echo $(timestamp) "Up-to-date"
     elif [ $LOCAL = $BASE ]; then
         echo $(timestamp) "Pulling changes from remote.."
 	sudo killall node
