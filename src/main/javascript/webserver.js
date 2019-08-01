@@ -57,13 +57,12 @@ let client;
 motorLeft.pwmWrite(0);
 
 //Server Socket listener
-io.sockets.on("connection", function (socket) {
+io.sockets.on("connection", function(socket) {
   // WebSocket Connection
 
-  socket.on("connection"),
-    identityObject => {
-      client = identityObject;
-    };
+  // socket.on("connection", identityObject => {
+  //   client = identityObject;
+  // });
 
   socket.on("motorLeftSocket", data => {
     //when motorLeftSocket receives data from client
@@ -96,7 +95,7 @@ http.listen(8080); //listen to port 8080
 console.log("waiting for connection on web-interface.");
 
 //Event Listener
-process.on("SIGINT", function () {
+process.on("SIGINT", function() {
   //on ctrl+c
   console.log("killing server.");
   motorLeft.pwmWrite(0); // Turn motorLeft off
@@ -148,7 +147,7 @@ const engine = {
 //-----------------------------------------------------------------------------
 //METHODS
 //-----------------------------------------------------------------------------
-Array.prototype.writeMotorsProto = function (speed) {
+Array.prototype.writeMotorsProto = function(speed) {
   this.forEach(motor => {
     if (speed > 100) {
       motor.pwmWrite(100);
@@ -160,7 +159,7 @@ Array.prototype.writeMotorsProto = function (speed) {
   });
 };
 
-Array.prototype.writeServosProto = function (steering) {
+Array.prototype.writeServosProto = function(steering) {
   this.forEach(servo => {
     if (steering > 2500) {
       servo.servoWrite(2500);
@@ -177,7 +176,7 @@ Array.prototype.writeServosProto = function (steering) {
 //-----------------------------------------------------------------------------
 function handler(req, res) {
   //create server
-  fs.readFile(__dirname + "/index.html", function (err, data) {
+  fs.readFile(__dirname + "/index.html", function(err, data) {
     //read file index.html in public folder
     if (err) {
       //error-handling
