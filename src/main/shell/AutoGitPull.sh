@@ -16,7 +16,7 @@ git checkout master
 git pull
 #sudo npm start &
 # sudo npm run $NPMRUN &
-npm start
+npm start &
 zenity --info --text "Startet Server" &
 #xterm -e 'bash -c "echo server is up;sleep 10"' &>/dev/null &
 
