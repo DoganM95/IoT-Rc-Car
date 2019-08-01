@@ -58,7 +58,7 @@ motorLeft.pwmWrite(0);
 
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
-  // WebSocket Connection
+  console.log("connection established!");
 
   // socket.on("connection", identityObject => {
   //   client = identityObject;
