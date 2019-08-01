@@ -15,7 +15,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "sudo node /home/pi/Project/RaspberryPi_RC-Car/src/main/javascript/webserver.js",
+    "start": "sudo node /home/pi/project/RaspberryPi_RC-Car/src/main/javascript/webserver.js",
     "shellstart": "sudo node /home/pi/project/RaspberryPi_RC-Car/src/main/javascript/shelltest.js"
   },
   "repository": {
