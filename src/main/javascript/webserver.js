@@ -52,8 +52,8 @@ let client;
 //Reset Pins to low - Init
 // servos.writeServosProto();
 // steering.writeServos(1500);
-// steering.leftServo.servoWrite(1000);
-// steering.rightServo.servoWrite(1500);
+steering.leftServo.servoWrite(1500);
+steering.rightServo.servoWrite(1500);
 motorLeft.pwmWrite(0);
 
 //Server Socket listener
