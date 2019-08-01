@@ -25,74 +25,74 @@ let servos = [servoLeft, servoRight]; //Control all servos at once
 let client;
 
 //-----------------------------------------------------------------------------
-//Mains
+//Main
 //-----------------------------------------------------------------------------
 
-(async () => {
-  let i = 0;
-  while (true) {
-    setTimeout(function() {
-      console.log(i);
-      i++;
-    }, 1);
-  }
+// (async () => {
+//   let i = 0;
+//   while (true) {
+//     setTimeout(function() {
+//       console.log(i);
+//       i++;
+//     }, 1);
+//   }
+// '
+  //Reset Pins to low - Init
+  // servos.writeServosProto();
+  // steering.writeServos(1500);
+  // steering.leftServo.servoWrite(1000);
+  // steering.rightServo.servoWrite(1500);
+  motorLeft.pwmWrite(0);
 
-  // //Reset Pins to low - Init
-  // // servos.writeServosProto();
-  // // steering.writeServos(1500);
-  // // steering.leftServo.servoWrite(1000);
-  // // steering.rightServo.servoWrite(1500);
-  // motorLeft.pwmWrite(0);
+  //Server Socket listener
+  io.sockets.on("connection", function(socket) {
+    // WebSocket Connection
 
-  // //Server Socket listener
-  // io.sockets.on("connection", function(socket) {
-  //   // WebSocket Connection
+    socket.on("connection"),
+      identityObject => {
+        client = identityObject;
+      };
 
-  //   socket.on("connection"),
-  //     identityObject => {
-  //       client = identityObject;
-  //     };
+    socket.on("motorLeftSocket", data => {
+      //when motorLeftSocket receives data from client
+      motorLeft.pwmWrite(data); //set motorLeft-speed
+      socket.emit("motorLeftSpeedSocket", motorLeft.getPwmDutyCycle()); //emit motorLeftSpeed to client-side to keep client updated about motorLefts current speed
+    });
 
-  //   socket.on("motorLeftSocket", data => {
-  //     //when motorLeftSocket receives data from client
-  //     motorLeft.pwmWrite(data); //set motorLeft-speed
-  //     socket.emit("motorLeftSpeedSocket", motorLeft.getPwmDutyCycle()); //emit motorLeftSpeed to client-side to keep client updated about motorLefts current speed
-  //   });
+    socket.on("servoSocket", data => {
+      //entry point for servo writes
 
-  //   socket.on("servoSocket", data => {
-  //     //entry point for servo writes
+      //TODO: place algorithm here to sync servo angles
+      steering.leftServo.servoWrite(data);
+      steering.rightServo.servoWrite(data);
 
-  //     //TODO: place algorithm here to sync servo angles
-  //     steering.leftServo.servoWrite(data);
-  //     steering.rightServo.servoWrite(data);
+      socket.emit(
+        "leftServoAngleSocket",
+        steering.leftServo.getServoPulseWidth()
+      );
+      socket.emit(
+        "rightServoAngleSocket",
+        steering.rightServo.getServoPulseWidth()
+      );
+    });
 
-  //     socket.emit(
-  //       "leftServoAngleSocket",
-  //       steering.leftServo.getServoPulseWidth()
-  //     );
-  //     socket.emit(
-  //       "rightServoAngleSocket",
-  //       steering.rightServo.getServoPulseWidth()
-  //     );
-  //   });
+    // motorLeft.pwmRange(30);
+  });
 
-  //   // motorLeft.pwmRange(30);
-  // });
+  //Server
+  http.listen(8080); //listen to port 8080
+  console.log("waiting for connection on web-interface.");
 
-  // //Server
-  // http.listen(8080); //listen to port 8080
-  // console.log("waiting for connection on web-interface.");
-
-  // //Event Listener
-  // process.on("SIGINT", function() {
-  //   //on ctrl+c
-  //   console.log("killing server.");
-  //   motorLeft.pwmWrite(0); // Turn motorLeft off
-  //   steering.leftServo.servoWrite(1500);
-  //   steering.rightServo.servoWrite(1500); // center steering
-  //   process.exit(); //exit completely
-  // });
-})();
+  //Event Listener
+  process.on("SIGINT", function() {
+    //on ctrl+c
+    console.log("killing server.");
+    motorLeft.pwmWrite(0); // Turn motorLeft off
+    steering.leftServo.servoWrite(1500);
+    steering.rightServo.servoWrite(1500); // center steering
+    process.exit(); //exit completely
+  });'
+// })();
 
 //-----------------------------------------------------------------------------
 //Objects
