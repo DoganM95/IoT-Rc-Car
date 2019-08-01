@@ -43,7 +43,7 @@ while :; do
 	sudo killall node
 	git pull
 	# sudo npm run $NPMRUN &
-    npm start
+    npm start &
     elif [ $REMOTE = $BASE ]; then
         echo $(timestamp) "Pushing local changes to remote.."
 	git pull
