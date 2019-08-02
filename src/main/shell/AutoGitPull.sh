@@ -12,7 +12,7 @@ echo "another run" >> /home/pi/Desktop/ran.txt
 cd /home/pi/project/RaspberryPi_RC-Car/
 sudo killall node
 git fetch
-git checkout master
+git checkout dev
 git pull
 #sudo npm start &
 # sudo npm run $NPMRUN &
