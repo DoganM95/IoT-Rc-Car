@@ -1,243 +1,279 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <link rel="manifest" href="manifest.json">
+  <head>
+    <link rel="manifest" href="manifest.json" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/101/three.min.js"></script>
     <!-- include socket.io client side script -->
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>First run</h1>
     <div id="buttons">
-        <button id="motorState">Run Da Motor</button> <!-- listen per eventlistener on any events -->
+      <button id="motorState">Run Da Motor</button>
+      <!-- listen per eventlistener on any events -->
 
-        <button id="leftMotorButton">Run Left Motor</button> <!-- listen per eventlistener on any events -->
-        <button id="rightMotorButton">Run Right Motor</button> <!-- listen per eventlistener on any events -->
+      <button id="leftMotorButton">Run Left Motor</button>
+      <!-- listen per eventlistener on any events -->
+      <button id="rightMotorButton">Run Right Motor</button>
+      <!-- listen per eventlistener on any events -->
 
-        <button id="servoLeftButton">Turn Servo Left</button>
-        <button id="servoRightButton">Turn Servo Right</button>
+      <button id="servoLeftButton">Turn Servo Left</button>
+      <button id="servoRightButton">Turn Servo Right</button>
     </div>
 
     <div id="sensors">
-        <h3 id="gamma">InitialGamma</h3>
-        <br>
-        <h3 id="beta">InitialBeta</h3>
-        <br>
-        <h3 id="alpha">InitialAlpha</h3>
-        <br>
-        <h3 id="absolute">InitialAbsolute</h3>
+      <h3 id="gamma">InitialGamma</h3>
+      <br />
+      <h3 id="beta">InitialBeta</h3>
+      <br />
+      <h3 id="alpha">InitialAlpha</h3>
+      <br />
+      <h3 id="absolute">InitialAbsolute</h3>
     </div>
 
     <script>
-        //Global Vars
-        let steering;
-        let speed;
-        let speedSetterReady = true;
-        let steeringSetterReady = true;
-        let semaphore = {
-            speed: {
-                free: true
-            },
-            steering: {
-                free: true
-            }
-        };
-        var socket = io(); //load socket.io-client and connect to the host that serves the page
-
-        (async function () { //Main
-            socket.emit("servoSocket", 1500); //initially center servo
-
-            window.addEventListener("load", function () { //when page loads
-                let motor = document.getElementById("motorState");
-                let servoLeftElement = document.getElementById("servoLeftButton");
-                let servoRightElement = document.getElementById("servoRightButton");
-                let motorSpeed = 0; //Stop motor initially
-                let servoAngle = 1500; //Center position intitially
-
-                //Increments for modules
-                let motorSpeedIncrement = 5;
-                let servoAngleIncrement = 10;
-
-                //Event Listeners:
-                motor.addEventListener("mousedown", function () { //when button is pressed
-                    socket.emit("motorSocket", 255); //send motor-run action (on)
-                });
-                motor.addEventListener("mouseup", function () { //when mouse is released
-                    socket.emit("motorSocket", 0); //send motor-stop action (off)
-                });
-                servoLeftElement.addEventListener("click", function () { //when button is clicked
-                    socket.emit("servoSocket", 2500); //turn servo most-clockwise
-                });
-                servoRightElement.addEventListener("click", function () { //when button is clicked
-                    socket.emit("servoSocket", 500); //turn servo most anti-clockwise
-                });
-
-                socket.on("motorSpeedSocket", (data) => { //when motor-speed changes, receive the speed via socket 
-                    motorSpeed = data; //set motorSpeed's value to the current speed
-                    console.log("received current motorSpeed via socket: " + motorSpeed);
-                });
-
-                socket.on("servoAngleSocket", (data) => {
-                    servoAngle = data;
-                    console.log("received current servoAngle via Socket: " + servoAngle);
-                });
-
-                document.addEventListener("keydown", (key) => { //Keypress Event listener
-                    console.log("Key: " + key.keyCode + " pressed."); //log the pressed key
-                    switch (key.keyCode) { //switch statement for pressed key
-                        case 40: //backwards
-                            if (motorSpeed > 0) {
-                                (async () => { socket.emit("motorSocket", (motorSpeed - motorSpeedIncrement)); })(); //increase motorSpeed by motorSpeedIncrement's value
-                            }
-                            break;
-                        case 38: //forwards
-                            if (motorSpeed < 255) {
-                                (async () => { socket.emit("motorSocket", (motorSpeed + motorSpeedIncrement)); })(); //decrease motorSpeed by motorSpeedIncrement's value
-                            }
-                            break;
-                        case 53: //Full Speed or stop (like play pause)
-                            if (motorSpeed > 0) {
-                                socket.emit("motorSocket", 0); //stops motor, if motor is running
-                            }
-                            if (motorSpeed == 0) {
-                                socket.emit("motorSocket", 255); //max-speeds motor, if it was off
-                            }
-                            break;
-                        //Servo direction control
-                        case 39: //key right
-                            if (servoAngle > 500) {
-                                (async () => {
-                                    socket.emit("servoSocket", servoAngle - servoAngleIncrement)
-                                    servoAngle -= servoAngleIncrement;
-                                })();
-                            }
-                            break;
-                        case 37: //key left
-                            if (servoAngle < 2500) {
-                                (async () => {
-                                    socket.emit("servoSocket", servoAngle + servoAngleIncrement)
-                                    servoAngle += servoAngleIncrement;
-                                })();
-                            }
-                            break;
-                    }
-                })
-
-                window.addEventListener("deviceorientation", handleOrientation, true); //reads axis information from device this html page is running on
-            });
-        })();
-
-
-
-        //Functions:
-        function handleOrientation(event) { //handles axis data
-            //Axis:
-            //        55            gamma
-            // -30    +-5    30     betas  //dead zone = 5 (the zone where nothing happens) is for speed only, as unwanted steering is not critical 
-            //       -55            gamma 
-
-            //Start
-            // roundAxisValue("speed", event.gamma, 50);
-            roundAxisValue("steering", event.beta, 50);
-
-            //Function Vars
-            var absolute = event.absolute;
-            var alpha = event.alpha;
-            var beta = event.beta;
-            var gamma = event.gamma;
-
-            //Manipulate DOM to show values on html page
-            document.getElementById("gamma").innerHTML = "Gamma: " + gamma;
-            document.getElementById("beta").innerHTML = "Beta: " + beta;
-            document.getElementById("alpha").innerHTML = "Alpha: " + alpha;
-            document.getElementById("absolute").innerHTML = "Absolute: " + absolute;
-
-            //after socket emit wait some time (ms) and free the semaphore, 
-            //only if semaphore is free, emit next change and occupy for ms again
+      //Global Vars
+      let steering;
+      let speed;
+      let speedSetterReady = true;
+      let steeringSetterReady = true;
+      let semaphore = {
+        speed: {
+          free: true
+        },
+        steering: {
+          free: true
         }
+      };
+      var socket = io(); //load socket.io-client and connect to the host that serves the page
 
-        async function roundAxisValue(property, axisValue, timeout) {
-            //gamma (speed) is between -55 and 55 in axis
-            //motorspeed can have dutycycle of 0 to 255
-            //complete deadzone = -5 to 5 = 10 axis-values
-            //each direction gets a range of 0 to 250
+      (async function() {
+        //Main
+        socket.emit("servoSocket", 1500); //initially center servo
 
+        window.addEventListener("load", function() {
+          //when page loads
+          let motor = document.getElementById("motorState");
+          let servoLeftElement = document.getElementById("servoLeftButton");
+          let servoRightElement = document.getElementById("servoRightButton");
+          let motorSpeed = 0; //Stop motor initially
+          let servoAngle = 1500; //Center position intitially
 
-            // let enterStageSpeed = false;
-            // let enterStageSteering = false;
+          //Increments for modules
+          let motorSpeedIncrement = 5;
+          let servoAngleIncrement = 10;
 
-            // if (property == "speed") {
-            //     if (semaphore.speed.free) {
-            //         enterStageSpeed = true;
-            //     }
-            //     semaphore.mode = "speed";
-            // }
-            // else if (property == "steering") {
-            //     steeringSetterReady = false;
-            //     semaphore.mode = "steering";
-            // }
-            // else {
-            //     return;
-            // }
+          //Event Listeners:
+          motor.addEventListener("mousedown", function() {
+            //when button is pressed
+            socket.emit("motorSocket", 255); //send motor-run action (on)
+          });
+          motor.addEventListener("mouseup", function() {
+            //when mouse is released
+            socket.emit("motorSocket", 0); //send motor-stop action (off)
+          });
+          servoLeftElement.addEventListener("click", function() {
+            //when button is clicked
+            socket.emit("servoSocket", 2500); //turn servo most-clockwise
+          });
+          servoRightElement.addEventListener("click", function() {
+            //when button is clicked
+            socket.emit("servoSocket", 500); //turn servo most anti-clockwise
+          });
 
-            // if (semaphore) {
-            try {
-                if (property == "speed") { //in case function gets speed param
-                    if (semaphore.speed.free) {
-                        semaphore.speed.free = false;
-                        await setTimeout(() => {
-                            let speed = Math.round(axisValue);
-                            if (speed >= 0 && speed <= 55) { //more likely not to be full speed so this comes first to save runtime
-                                console.log("setting speed now to " + speed * 5);
-                                socket.emit("motorSocket", speed);
-                            }
-                            else if (speed > 55) {
-                                socket.emit("motorSocket", 255); //power mode (adds missing 5)
-                            }
-                        }, timeout);
-                        semaphore.speed.free = true;
-                    }
+          socket.on("motorSpeedSocket", data => {
+            //when motor-speed changes, receive the speed via socket
+            motorSpeed = data; //set motorSpeed's value to the current speed
+            console.log(
+              "received current motorSpeed via socket: " + motorSpeed
+            );
+          });
+
+          socket.on("servoAngleSocket", data => {
+            servoAngle = data;
+            console.log(
+              "received current servoAngle via Socket: " + servoAngle
+            );
+          });
+
+          document.addEventListener("keydown", key => {
+            //Keypress Event listener
+            console.log("Key: " + key.keyCode + " pressed."); //log the pressed key
+            switch (
+              key.keyCode //switch statement for pressed key
+            ) {
+              case 40: //backwards
+                if (motorSpeed > 0) {
+                  (async () => {
+                    socket.emit(
+                      "motorSocket",
+                      motorSpeed - motorSpeedIncrement
+                    );
+                  })(); //increase motorSpeed by motorSpeedIncrement's value
                 }
-
-                //beta (steering) is between -30 and 30 in axis
-                //servo angle can be between 500 (== 90°(deg)) and 2500 (== -90°(deg))
-                if (property == "steering") { //in case function gets steering param
-                    if (semaphore.steering.free) {
-                        let steering = Math.round(axisValue);
-                        if (steering >= 0 && steering < 30) { //tilt right
-                            console.log("writing right " + (1500 - (Math.abs(steering) * 33)) + "to servo");
-                            socket.emit("servoSocket", (1500 - (Math.abs(steering) * 33))); //goes to max 2490, rest is handled by overtilt right to 2500
-                        }
-                        else if (steering <= 0 && steering > (-30)) { //tilt left
-                            console.log("writing left " + (1500 + (Math.abs(steering) * 33)) + "to servo");
-                            socket.emit("servoSocket", (1500 + (Math.abs(steering) * 33))); //goes to min 210, rest is handled by overtilt left to 500
-                        }
-                        else if (steering <= -30) {
-                            socket.emit("servoSocket", 2500);
-                        }
-                        else if (steering >= 30) {
-                            socket.emit("servoSocket", 500);
-                        }
-                        else {
-                            return;
-                        }
-                    }
-
+                break;
+              case 38: //forwards
+                if (motorSpeed < 255) {
+                  (async () => {
+                    socket.emit(
+                      "motorSocket",
+                      motorSpeed + motorSpeedIncrement
+                    );
+                  })(); //decrease motorSpeed by motorSpeedIncrement's value
                 }
-                else {
-                    throw (new Error("roundAxisValue() can only take 'speed' or 'steering'. You typed " + property));
+                break;
+              case 53: //Full Speed or stop (like play pause)
+                if (motorSpeed > 0) {
+                  socket.emit("motorSocket", 0); //stops motor, if motor is running
                 }
+                if (motorSpeed == 0) {
+                  socket.emit("motorSocket", 255); //max-speeds motor, if it was off
+                }
+                break;
+              //Servo direction control
+              case 39: //key right
+                if (servoAngle > 500) {
+                  (async () => {
+                    socket.emit(
+                      "servoSocket",
+                      servoAngle - servoAngleIncrement
+                    );
+                    servoAngle -= servoAngleIncrement;
+                  })();
+                }
+                break;
+              case 37: //key left
+                if (servoAngle < 2500) {
+                  (async () => {
+                    socket.emit(
+                      "servoSocket",
+                      servoAngle + servoAngleIncrement
+                    );
+                    servoAngle += servoAngleIncrement;
+                  })();
+                }
+                break;
             }
-            catch (err) {
-                console.log(err);
-            }
-            // semaphore.free = true; //free slot for next value
-            // console.log(semaphore.mode + "ready stage");
-        }
+          });
+          window.addEventListener("deviceorientation", handleOrientation, true); //reads axis information from device this html page is running on
+        });
+      })();
+
+      //Functions:
+      function handleOrientation(event) {
+        //handles axis data
+        //Axis:
+        //        55            gamma
+        // -30    +-5    30     betas  //dead zone = 5 (the zone where nothing happens) is for speed only, as unwanted steering is not critical
+        //       -55            gamma
+
+        //Start
+        // roundAxisValue("speed", event.gamma, 50);
+        roundAxisValue("steering", event.beta, 50);
+
+        //Function Vars
+        var absolute = event.absolute;
+        var alpha = event.alpha;
+        var beta = event.beta;
+        var gamma = event.gamma;
+
+        //Manipulate DOM to show values on html page
+        document.getElementById("gamma").innerHTML = "Gamma: " + gamma;
+        document.getElementById("beta").innerHTML = "Beta: " + beta;
+        document.getElementById("alpha").innerHTML = "Alpha: " + alpha;
+        document.getElementById("absolute").innerHTML = "Absolute: " + absolute;
+
+        //after socket emit wait some time (ms) and free the semaphore,
+        //only if semaphore is free, emit next change and occupy for ms again
+      }
+
+      async function roundAxisValue(property, axisValue, timeout) {
+        //gamma (speed) is between -55 and 55 in axis
+        //motorspeed can have dutycycle of 0 to 255
+        //complete deadzone = -5 to 5 = 10 axis-values
+        //each direction gets a range of 0 to 250
+
+        // let enterStageSpeed = false;
+        // let enterStageSteering = false;
+
+        // if (property == "speed") {
+        //     if (semaphore.speed.free) {
+        //         enterStageSpeed = true;
+        //     }
+        //     semaphore.mode = "speed";
         // }
-    </script>
-</body>
+        // else if (property == "steering") {
+        //     steeringSetterReady = false;
+        //     semaphore.mode = "steering";
+        // }
+        // else {
+        //     return;
+        // }
 
+        // if (semaphore) {
+        try {
+          if (property == "speed") {
+            //in case function gets speed param
+            if (semaphore.speed.free) {
+              semaphore.speed.free = false;
+              await setTimeout(() => {
+                let speed = Math.round(axisValue);
+                if (speed >= 0 && speed <= 55) {
+                  //more likely not to be full speed so this comes first to save runtime
+                  console.log("setting speed now to " + speed * 5);
+                  socket.emit("motorSocket", speed);
+                } else if (speed > 55) {
+                  socket.emit("motorSocket", 255); //power mode (adds missing 5)
+                }
+              }, timeout);
+              semaphore.speed.free = true;
+            }
+          }
+
+          //beta (steering) is between -30 and 30 in axis
+          //servo angle can be between 500 (== 90°(deg)) and 2500 (== -90°(deg))
+          if (property == "steering") {
+            //in case function gets steering param
+            if (semaphore.steering.free) {
+              let steering = Math.round(axisValue);
+              if (steering >= 0 && steering < 30) {
+                //tilt right
+                console.log(
+                  "writing right " +
+                    (1500 - Math.abs(steering) * 33) +
+                    "to servo"
+                );
+                socket.emit("servoSocket", 1500 - Math.abs(steering) * 33); //goes to max 2490, rest is handled by overtilt right to 2500
+              } else if (steering <= 0 && steering > -30) {
+                //tilt left
+                console.log(
+                  "writing left " +
+                    (1500 + Math.abs(steering) * 33) +
+                    "to servo"
+                );
+                socket.emit("servoSocket", 1500 + Math.abs(steering) * 33); //goes to min 210, rest is handled by overtilt left to 500
+              } else if (steering <= -30) {
+                socket.emit("servoSocket", 2500);
+              } else if (steering >= 30) {
+                socket.emit("servoSocket", 500);
+              } else {
+                return;
+              }
+            }
+          } else {
+            throw new Error(
+              "roundAxisValue() can only take 'speed' or 'steering'. You typed " +
+                property
+            );
+          }
+        } catch (err) {
+          console.log(err);
+        }
+        // semaphore.free = true; //free slot for next value
+        // console.log(semaphore.mode + "ready stage");
+      }
+      // }
+    </script>
+  </body>
 </html>
