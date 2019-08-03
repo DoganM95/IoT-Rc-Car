@@ -1,5 +1,5 @@
-let http = require("http").createServer(handler); //require http server, and create server with function handler()
-let https = require("https").createServer(handler); //NEEDS FIX
+let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
+let https = require("https").createServer(httpHandler); //NEEDS FIX
 let fs = require("fs"); //require filesystem module
 let io = require("socket.io")(http); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
 let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
@@ -51,25 +51,29 @@ let engineRight = {
 
 let client;
 
+const steering = {
+  leftServo: servoLeft,
+  rightServo: servoRight,
+
+  writeServos(rotation) {
+    Object.keys(this).forEach(servo => {
+      if (rotation > 2500) {
+        servo.servoWrite(2500);
+      } else if (rotation < 500) {
+        servo.servoWrite(500);
+      } else {
+        servo.servoWrite(rotation);
+      }
+    });
+  }
+};
+
 //-----------------------------------------------------------------------------
 //Main
 //-----------------------------------------------------------------------------
 
-// (async () => {
-//   let i = 0;
-//   while (true) {
-//     setTimeout(function() {
-//       console.log(i);
-//       i++;
-//     }, 1);
-//   }
-// '
-//Reset Pins to low - Init
-// servos.writeServosProto();
-// steering.writeServos(1500);
 servoLeft.servoWrite(1500);
 servoRight.servoWrite(1500);
-motorLeft.pwmWrite(0);
 
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
@@ -113,94 +117,21 @@ process.on("SIGINT", function() {
   process.exit(); //exit completely
 });
 
-// })();
-
-//-----------------------------------------------------------------------------
-//Objects
-//-----------------------------------------------------------------------------
-const steering = {
-  leftServo: servoLeft,
-  rightServo: servoRight,
-
-  writeServos(rotation) {
-    Object.keys(this).forEach(servo => {
-      if (rotation > 2500) {
-        servo.servoWrite(2500);
-      } else if (rotation < 500) {
-        servo.servoWrite(500);
-      } else {
-        servo.servoWrite(rotation);
-      }
-    });
-  }
-};
-
-const engine = {
-  leftMotor: motorLeft,
-  rightMotor: motorRight,
-
-  writeMotors(speed) {
-    Object.values /
-      this.forEach(motor => {
-        if (speed > 100) {
-          motor.pwmWrite(100);
-        } else if (speed < 0) {
-          motor.pwmWrite(0);
-        } else {
-          motor.pwmWrite(speed);
-        }
-      });
-  }
-};
-
-//-----------------------------------------------------------------------------
-//METHODS
-//-----------------------------------------------------------------------------
-Array.prototype.writeMotorsProto = function(speed) {
-  this.forEach(motor => {
-    if (speed > 100) {
-      motor.pwmWrite(100);
-    } else if (speed < 0) {
-      motor.pwmWrite(0);
-    } else {
-      motor.pwmWrite(speed);
-    }
-  });
-};
-
-Array.prototype.writeServosProto = function(steering) {
-  this.forEach(servo => {
-    if (steering > 2500) {
-      servo.servoWrite(2500);
-    } else if (steering < 500) {
-      servo.servoWrite(500);
-    } else {
-      servo.servoWrite(steering);
-    }
-  });
-};
-
 //-----------------------------------------------------------------------------
 //Functions
 //-----------------------------------------------------------------------------
-function handler(req, res) {
+function httpHandler(req, res) {
   //create server
   fs.readFile(__dirname + "/index.html", function(err, data) {
     //read file index.html in public folder
-    if (err) {
-      //error-handling
-      res.writeHead(404, {
-        "Content-Type": "text/html"
-      }); //display 404 on error
-      res.end("404 Not Found");
-      return;
-    } else {
-      //just for readability
-      res.writeHead(200, {
-        "Content-Type": "text/html"
-      }); //write HTML
+    if (!err) {
+      res.writeHead(200, { "Content-Type": "text/html" }); //write HTML
       res.write(data); //write data from index.html
       res.end();
+      return;
+    } else {
+      res.writeHead(404, { "Content-Type": "text/html" }); //display 404 on error
+      res.end("404 Not Found");
       return;
     }
   });
