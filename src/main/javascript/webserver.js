@@ -36,12 +36,12 @@ let engineLeft = {
   backward: new gpio(19, {mode:pigpio.OUTPUT}),
   speed: new pigpio(21, {mode:pigpio.OUTPUT}),
   setForward: function(){
-    engineLeft.forward.write(1);
-    engineLeft.backward.write(0);
+    engineLeft.forward.writeSync(1);
+    engineLeft.backward.writeSync(0);
   },
   setBackward: function(){
-    engineLeft.forward.write(0);
-    engineLeft.backward.write(1);
+    engineLeft.forward.writeSync(0);
+    engineLeft.backward.writeSync(1);
   },
   setSpeed: function(){
     this.speed.pwmWrite()
@@ -51,12 +51,12 @@ let engineRight = {
   forward: new gpio(13, {mode:pigpio.OUTPUT}),
   backward: new gpio(6, {mode:pigpio.OUTPUT}),
   setForward: function(){
-    engineRight.forward.write(1);
-    engineRight.backward.write(0);
+    engineRight.forward.writeSync(1);
+    engineRight.backward.writeSync(0);
   },
   setBackward: function(){
-    engineRight.forward.write(0);
-    engineRight.backward.write(1);
+    engineRight.forward.writeSync(0);
+    engineRight.backward.writeSync(1);
   }
 }
 
