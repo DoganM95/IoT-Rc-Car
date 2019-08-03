@@ -8,7 +8,7 @@ NPMRUN="shellstart"
 
 
 #start RC-Car Server initially on boot
-echo "another run" >> /home/pi/Desktop/ran.txt
+echo $(timestamp) >> /home/pi/Desktop/ran.txt
 cd /home/pi/project/RaspberryPi_RC-Car/
 sudo killall node
 git fetch
