@@ -2,7 +2,7 @@ let http = require("http").createServer(handler); //require http server, and cre
 let https = require("https").createServer(handler); //NEEDS FIX
 let fs = require("fs"); //require filesystem module
 let io = require("socket.io")(http); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
-let Gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
+let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
 let pigpio = require("pigpio").Gpio; //https://www.npmjs.com/package/pigpio#servo-control //include pigpio to enable pulse width modulation for servo
 let three = require("three"); //https://www.npmjs.com/package/three //
 
@@ -24,15 +24,43 @@ let servoRight = new pigpio(24, {
   mode: pigpio.OUTPUT
 });
 
-let engineLeftSpeed = new pigpio(17, {
+let engineLeftPWM = new pigpio(21, {
   mode: pigpio.OUTPUT
 });
-let engineRightSpeed = new pigpio(16, {
+let engineRightPWM = new pigpio(20, {
   mode: pigpio.OUTPUT
 });
 
-let motors = [motorLeft, motorRight]; //Control all motors at once
-let servos = [servoLeft, servoRight]; //Control all servos at once
+let engineLeft = {
+  forward: new gpio(26, {mode:pigpio.OUTPUT}),
+  backward: new gpio(19, {mode:pigpio.OUTPUT}),
+  speed: new pigpio(21, {mode:pigpio.OUTPUT}),
+  setForward: function(){
+    engineLeft.forward.write(1);
+    engineLeft.backward.write(0);
+  },
+  setBackward: function(){
+    engineLeft.forward.write(0);
+    engineLeft.backward.write(1);
+  },
+  setSpeed: function(){
+    this.speed.pwmWrite()
+  }
+}
+let engineRight = {
+  forward: new gpio(13, {mode:pigpio.OUTPUT}),
+  backward: new gpio(6, {mode:pigpio.OUTPUT}),
+  setForward: function(){
+    engineRight.forward.write(1);
+    engineRight.backward.write(0);
+  },
+  setBackward: function(){
+    engineRight.forward.write(0);
+    engineRight.backward.write(1);
+  }
+}
+
+
 
 let client;
 
@@ -77,14 +105,8 @@ io.sockets.on("connection", function(socket) {
     steering.leftServo.servoWrite(data);
     steering.rightServo.servoWrite(data);
 
-    socket.emit(
-      "leftServoAngleSocket",
-      steering.leftServo.getServoPulseWidth()
-    );
-    socket.emit(
-      "rightServoAngleSocket",
-      steering.rightServo.getServoPulseWidth()
-    );
+    socket.emit("leftServoAngleSocket", steering.leftServo.getServoPulseWidth());
+    socket.emit("rightServoAngleSocket", steering.rightServo.getServoPulseWidth());
   });
 
   // motorLeft.pwmRange(30);

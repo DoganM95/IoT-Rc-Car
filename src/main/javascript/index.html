@@ -70,6 +70,9 @@
       };
       let motorSpeed = 0; //Stop motor initially
       let servoAngle = 1500; //Center position intitially
+      //Increments for modules
+      let motorSpeedIncrement = 5;
+      let servoAngleIncrement = 10;
 
       //---------------------------------------------------------------------
       // MAIN
@@ -86,10 +89,6 @@
         let motor = document.getElementById("motorState");
         let servoLeftElement = document.getElementById("servoLeftButton");
         let servoRightElement = document.getElementById("servoRightButton");
-
-        //Increments for modules
-        let motorSpeedIncrement = 5;
-        let servoAngleIncrement = 10;
 
         //Event Listeners:
         motor.addEventListener("mousedown", function() {
@@ -183,7 +182,7 @@
         //       -55            gamma
 
         //Start
-        // roundAxisValue("speed", event.gamma, 50);
+        roundAxisValue("speed", event.gamma, 50);
         roundAxisValue("steering", event.beta, 50);
 
         //Manipulate DOM to show values on html page
@@ -209,12 +208,14 @@
                 if (speed >= 0 && speed <= 55) {
                   //more likely not to be full speed so this comes first to save runtime
                   console.log("setting speed now to " + speed * 5);
-                  socket.emit("motorSocket", speed);
+                  socket.emit("motorForwardSocket", speed);
                 } else if (speed > 55) {
                   socket.emit("motorSocket", 255); //power mode (adds missing 5)
                 }
               }, timeout);
               semaphore.speed.free = true;
+            } else {
+              return;
             }
           }
 
@@ -248,6 +249,7 @@
         } catch (err) {
           console.log(err);
         }
+        return;
       }
     </script>
   </body>
