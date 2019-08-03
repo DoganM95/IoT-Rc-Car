@@ -9,21 +9,26 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
-//GPIO Objects
-let motorLeft = new pigpio(4, {
-  mode: pigpio.OUTPUT
-}); //use GPIO pin 4 as output
-let motorRight = new pigpio(4, {
-  mode: pigpio.OUTPUT
-}); //use GPIO pin 4 as output
-
-let servoLeft = new pigpio(23, { mode: pigpio.OUTPUT });
-let servoRight = new pigpio(24, { mode: pigpio.OUTPUT });
+let steering = {
+  leftServo: new pigpio(23, { mode: pigpio.OUTPUT }),
+  rightServo: new pigpio(24, { mode: pigpio.OUTPUT }),
+  setDirection: function(angle) {
+    //Syncing algorithm comes here
+    this.leftServo.servoWrite(angle);
+    this.rightServo.servoWrite(angle);
+  }
+};
 
 let engineLeft = {
-  forward: new gpio(26, { mode: pigpio.OUTPUT }),
-  backward: new gpio(19, { mode: pigpio.OUTPUT }),
-  speed: new pigpio(21, { mode: pigpio.OUTPUT }),
+  forward: new gpio(26, {
+    mode: pigpio.OUTPUT
+  }),
+  backward: new gpio(19, {
+    mode: pigpio.OUTPUT
+  }),
+  speed: new pigpio(21, {
+    mode: pigpio.OUTPUT
+  }),
   setForward: function() {
     engineLeft.forward.writeSync(1);
     engineLeft.backward.writeSync(0);
@@ -32,13 +37,17 @@ let engineLeft = {
     engineLeft.forward.writeSync(0);
     engineLeft.backward.writeSync(1);
   },
-  setSpeed: function() {
-    this.speed.pwmWrite();
+  setSpeed: function(speed) {
+    this.speed.pwmWrite(speed);
   }
 };
 let engineRight = {
-  forward: new gpio(13, { mode: pigpio.OUTPUT }),
-  backward: new gpio(6, { mode: pigpio.OUTPUT }),
+  forward: new gpio(13, {
+    mode: pigpio.OUTPUT
+  }),
+  backward: new gpio(6, {
+    mode: pigpio.OUTPUT
+  }),
   setForward: function() {
     engineRight.forward.writeSync(1);
     engineRight.backward.writeSync(0);
@@ -49,7 +58,7 @@ let engineRight = {
   }
 };
 
-let client;
+let clients = [];
 
 const steering = {
   leftServo: servoLeft,
@@ -72,35 +81,29 @@ const steering = {
 //Main
 //-----------------------------------------------------------------------------
 
-servoLeft.servoWrite(1500);
-servoRight.servoWrite(1500);
-
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
-  console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
+  console.log(
+    "connection established from " +
+      socket.client.conn.remoteAddress +
+      " - " +
+      new Date().toUTCString()
+  );
+  clients.pop();
+  clients.push(socket.client);
 
-  // socket.on("connection", identityObject => {
-  //   client = identityObject;
-  // });
-
-  socket.on("motorLeftSocket", data => {
-    //when motorLeftSocket receives data from client
-    motorLeft.pwmWrite(data); //set motorLeft-speed
-    socket.emit("motorLeftSpeedSocket", motorLeft.getPwmDutyCycle()); //emit motorLeftSpeed to client-side to keep client updated about motorLefts current speed
-  });
+  socket.on("engineLeftSocket", data => {});
+  socket.on("engineRightSocket", data => {});
 
   socket.on("servoSocket", data => {
-    //entry point for servo writes
-
     //TODO: place algorithm here to sync servo angles
-    steering.leftServo.servoWrite(data);
-    steering.rightServo.servoWrite(data);
+    steering.setDirection(data);
 
-    socket.emit("leftServoAngleSocket", steering.leftServo.getServoPulseWidth());
-    socket.emit("rightServoAngleSocket", steering.rightServo.getServoPulseWidth());
+    socket.emit(
+      "steeringSocket",
+      (steering.leftServo.getServoPulseWidth() + steering.rightServo.getServoPulseWidth()) / 2
+    );
   });
-
-  // motorLeft.pwmRange(30);
 });
 
 //Server
@@ -112,8 +115,7 @@ process.on("SIGINT", function() {
   //on ctrl+c
   console.log("killing server.");
   motorLeft.pwmWrite(0); // Turn motorLeft off
-  steering.leftServo.servoWrite(1500);
-  steering.rightServo.servoWrite(1500); // center steering
+  steering.setDirection(1500);
   process.exit(); //exit completely
 });
 
@@ -123,12 +125,16 @@ process.on("SIGINT", function() {
 function httpHandler(req, res) {
   fs.readFile(__dirname + "/index.html", function(err, data) {
     if (!err) {
-      res.writeHead(200, { "Content-Type": "text/html" }); //write HTML
+      res.writeHead(200, {
+        "Content-Type": "text/html"
+      }); //write HTML
       res.write(data); //write data from index.html
       res.end();
       return;
     } else {
-      res.writeHead(404, { "Content-Type": "text/html" }); //display 404 on error
+      res.writeHead(404, {
+        "Content-Type": "text/html"
+      }); //display 404 on error
       res.end("404 Not Found");
       return;
     }
