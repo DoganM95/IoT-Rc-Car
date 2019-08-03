@@ -10,6 +10,7 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 //Variables
 //-----------------------------------------------------------------------------
 let clients = [];
+let clientAxisLimits;
 
 let steering = {
   leftServo: new pigpio(23, { mode: pigpio.OUTPUT }),
@@ -61,6 +62,27 @@ let engine = {
     setBackward: function() {
       engineRight.forward.writeSync(0);
       engineRight.backward.writeSync(1);
+    },
+    setSpeed: function(speed) {
+      this.speed.pwmWrite(speed);
+    }
+  },
+  bothMotors: {
+    setForward: function() {
+      engineRight.forward.writeSync(1);
+      engineLeft.forward.writeSync(1);
+      engineRight.backward.writeSync(0);
+      engineLeft.backward.writeSync(0);
+    },
+    setBackward: function() {
+      engineLeft.forward.writeSync(0);
+      engineRight.forward.writeSync(0);
+      engineRight.backward.writeSync(1);
+      engineLeft.backward.writeSync(1);
+    },
+    setSpeed: function(speed) {
+      engine.leftMotor.setSpeed(speed);
+      engine.rightMotor.setSpeed(speed);
     }
   },
   avgMotor: {
@@ -69,6 +91,8 @@ let engine = {
     }
   }
 };
+
+engine.rightMotor.speed.pwm;
 
 //-----------------------------------------------------------------------------
 //Main
@@ -79,7 +103,30 @@ io.sockets.on("connection", function(socket) {
   console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
   clients.pop();
   clients.push(socket.client);
+  socket.on("axisLimits", data => {
+    clientAxisLimits = data;
+  });
 
+  socket.on("engineSocket", data => {
+    let angle = data.angle;
+    if (angle < -5) {
+      if (angle < clientAxisLimits.bottom) {
+        engine.bothMotors.setBackward();
+        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
+      } else {
+        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle);
+      }
+    } else if (angle > 5) {
+      if (angle > clientAxisLimits.top) {
+        engine.bothMotors.setForward();
+        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
+      } else {
+        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle);
+      }
+    } else {
+      engine.bothMotors.setSpeed(0);
+    }
+  });
   socket.on("engineLeftSocket", data => {});
   socket.on("engineRightSocket", data => {});
   socket.on("steeringSocket", data => {
