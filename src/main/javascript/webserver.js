@@ -9,6 +9,8 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
+let clients = [];
+
 let steering = {
   leftServo: new pigpio(23, { mode: pigpio.OUTPUT }),
   rightServo: new pigpio(24, { mode: pigpio.OUTPUT }),
@@ -55,25 +57,6 @@ let engineRight = {
   setBackward: function() {
     engineRight.forward.writeSync(0);
     engineRight.backward.writeSync(1);
-  }
-};
-
-let clients = [];
-
-const steering = {
-  leftServo: servoLeft,
-  rightServo: servoRight,
-
-  writeServos(rotation) {
-    Object.keys(this).forEach(servo => {
-      if (rotation > 2500) {
-        servo.servoWrite(2500);
-      } else if (rotation < 500) {
-        servo.servoWrite(500);
-      } else {
-        servo.servoWrite(rotation);
-      }
-    });
   }
 };
 
