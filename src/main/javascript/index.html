@@ -78,7 +78,7 @@
       // MAIN
       //---------------------------------------------------------------------
 
-      socket.emit("servoSocket", 1500); //initially center servo
+      socket.emit("steeringSocket", 1500); //initially center servo
 
       window.addEventListener("load", function() {
         //DOM
@@ -133,7 +133,7 @@
             case 39: //key right
               if (servoAngle > 500) {
                 (async () => {
-                  socket.emit("servoSocket", servoAngle - servoAngleIncrement);
+                  socket.emit("steeringSocket", servoAngle - servoAngleIncrement);
                   servoAngle -= servoAngleIncrement;
                 })();
               }
@@ -141,7 +141,7 @@
             case 37: //key left
               if (servoAngle < 2500) {
                 (async () => {
-                  socket.emit("servoSocket", servoAngle + servoAngleIncrement);
+                  socket.emit("steeringSocket", servoAngle + servoAngleIncrement);
                   servoAngle += servoAngleIncrement;
                 })();
               }
@@ -210,15 +210,15 @@
               if (steering >= 0 && steering < 30) {
                 //tilt right
                 console.log("writing right " + (1500 - Math.abs(steering) * 33) + "to servo");
-                socket.emit("servoSocket", 1500 - Math.abs(steering) * 33); //goes to max 2490, rest is handled by overtilt right to 2500
+                socket.emit("steeringSocket", 1500 - Math.abs(steering) * 33); //goes to max 2490, rest is handled by overtilt right to 2500
               } else if (steering <= 0 && steering > -30) {
                 //tilt left
                 console.log("writing left " + (1500 + Math.abs(steering) * 33) + "to servo");
-                socket.emit("servoSocket", 1500 + Math.abs(steering) * 33); //goes to min 210, rest is handled by overtilt left to 500
+                socket.emit("steeringSocket", 1500 + Math.abs(steering) * 33); //goes to min 210, rest is handled by overtilt left to 500
               } else if (steering <= -30) {
-                socket.emit("servoSocket", 2500);
+                socket.emit("steeringSocket", 2500);
               } else if (steering >= 30) {
-                socket.emit("servoSocket", 500);
+                socket.emit("steeringSocket", 500);
               } else {
                 return;
               }

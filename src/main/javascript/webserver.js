@@ -21,44 +21,54 @@ let steering = {
   }
 };
 
-let engineLeft = {
-  forward: new gpio(26, {
-    mode: pigpio.OUTPUT
-  }),
-  backward: new gpio(19, {
-    mode: pigpio.OUTPUT
-  }),
-  speed: new pigpio(21, {
-    mode: pigpio.OUTPUT
-  }),
-  setForward: function() {
-    engineLeft.forward.writeSync(1);
-    engineLeft.backward.writeSync(0);
+let engine = {
+  leftMotor: {
+    forward: new gpio(26, {
+      mode: pigpio.OUTPUT
+    }),
+    backward: new gpio(19, {
+      mode: pigpio.OUTPUT
+    }),
+    speed: new pigpio(21, {
+      mode: pigpio.OUTPUT
+    }),
+    setForward: function() {
+      engineLeft.forward.writeSync(1);
+      engineLeft.backward.writeSync(0);
+    },
+    setBackward: function() {
+      engineLeft.forward.writeSync(0);
+      engineLeft.backward.writeSync(1);
+    },
+    setSpeed: function(speed) {
+      this.speed.pwmWrite(speed);
+    }
+  }, 
+  rightMotor: {
+    forward: new gpio(13, {
+      mode: pigpio.OUTPUT
+    }),
+    backward: new gpio(6, {
+      mode: pigpio.OUTPUT
+    }),
+    setForward: function() {
+      engineRight.forward.writeSync(1);
+      engineRight.backward.writeSync(0);
+    },
+    setBackward: function() {
+      engineRight.forward.writeSync(0);
+      engineRight.backward.writeSync(1);
+    }
   },
-  setBackward: function() {
-    engineLeft.forward.writeSync(0);
-    engineLeft.backward.writeSync(1);
-  },
-  setSpeed: function(speed) {
-    this.speed.pwmWrite(speed);
+  avgMotor: {
+    getSpeed: function(){
+      return (engine.leftMotor.speed.getPwmDutyCycle() + engine.rightMotor.speed.getPwmDutyCycle()) / 2;
+    }
   }
 };
-let engineRight = {
-  forward: new gpio(13, {
-    mode: pigpio.OUTPUT
-  }),
-  backward: new gpio(6, {
-    mode: pigpio.OUTPUT
-  }),
-  setForward: function() {
-    engineRight.forward.writeSync(1);
-    engineRight.backward.writeSync(0);
-  },
-  setBackward: function() {
-    engineRight.forward.writeSync(0);
-    engineRight.backward.writeSync(1);
-  }
-};
+
+
+let ;
 
 //-----------------------------------------------------------------------------
 //Main
@@ -77,13 +87,10 @@ io.sockets.on("connection", function(socket) {
 
   socket.on("engineLeftSocket", data => {});
   socket.on("engineRightSocket", data => {});
-
-  socket.on("servoSocket", data => {
-    //TODO: place algorithm here to sync servo angles
+  socket.on("steeringSocket", data => {
     steering.setDirection(data);
-
     socket.emit(
-      "steeringSocket",
+      "servoSocket",
       (steering.leftServo.getServoPulseWidth() + steering.rightServo.getServoPulseWidth()) / 2
     );
   });
