@@ -90,24 +90,6 @@
         let servoLeftElement = document.getElementById("servoLeftButton");
         let servoRightElement = document.getElementById("servoRightButton");
 
-        //Event Listeners:
-        motor.addEventListener("mousedown", function() {
-          //when button is pressed
-          socket.emit("motorSocket", 255); //send motor-run action (on)
-        });
-        motor.addEventListener("mouseup", function() {
-          //when mouse is released
-          socket.emit("motorSocket", 0); //send motor-stop action (off)
-        });
-        servoLeftElement.addEventListener("click", function() {
-          //when button is clicked
-          socket.emit("servoSocket", 2500); //turn servo most-clockwise
-        });
-        servoRightElement.addEventListener("click", function() {
-          //when button is clicked
-          socket.emit("servoSocket", 500); //turn servo most anti-clockwise
-        });
-
         socket.on("motorSpeedSocket", data => {
           //when motor-speed changes, receive the speed via socket
           motorSpeed = data; //set motorSpeed's value to the current speed
