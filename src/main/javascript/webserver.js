@@ -114,14 +114,14 @@ io.sockets.on("connection", function(socket) {
         engine.bothMotors.setBackward();
         engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
       } else {
-        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle);
+        engine.bothMotors.setSpeed(Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle));
       }
     } else if (angle > 5) {
       if (angle > clientAxisLimits.top) {
         engine.bothMotors.setForward();
         engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
       } else {
-        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle);
+        engine.bothMotors.setSpeed(Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.top / angle));
       }
     } else {
       engine.bothMotors.setSpeed(0);
