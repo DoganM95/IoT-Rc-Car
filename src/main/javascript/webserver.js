@@ -17,50 +17,37 @@ let motorRight = new pigpio(4, {
   mode: pigpio.OUTPUT
 }); //use GPIO pin 4 as output
 
-let servoLeft = new pigpio(23, {
-  mode: pigpio.OUTPUT
-});
-let servoRight = new pigpio(24, {
-  mode: pigpio.OUTPUT
-});
-
-let engineLeftPWM = new pigpio(21, {
-  mode: pigpio.OUTPUT
-});
-let engineRightPWM = new pigpio(20, {
-  mode: pigpio.OUTPUT
-});
+let servoLeft = new pigpio(23, { mode: pigpio.OUTPUT });
+let servoRight = new pigpio(24, { mode: pigpio.OUTPUT });
 
 let engineLeft = {
-  forward: new gpio(26, {mode:pigpio.OUTPUT}),
-  backward: new gpio(19, {mode:pigpio.OUTPUT}),
-  speed: new pigpio(21, {mode:pigpio.OUTPUT}),
-  setForward: function(){
+  forward: new gpio(26, { mode: pigpio.OUTPUT }),
+  backward: new gpio(19, { mode: pigpio.OUTPUT }),
+  speed: new pigpio(21, { mode: pigpio.OUTPUT }),
+  setForward: function() {
     engineLeft.forward.writeSync(1);
     engineLeft.backward.writeSync(0);
   },
-  setBackward: function(){
+  setBackward: function() {
     engineLeft.forward.writeSync(0);
     engineLeft.backward.writeSync(1);
   },
-  setSpeed: function(){
-    this.speed.pwmWrite()
+  setSpeed: function() {
+    this.speed.pwmWrite();
   }
-}
+};
 let engineRight = {
-  forward: new gpio(13, {mode:pigpio.OUTPUT}),
-  backward: new gpio(6, {mode:pigpio.OUTPUT}),
-  setForward: function(){
+  forward: new gpio(13, { mode: pigpio.OUTPUT }),
+  backward: new gpio(6, { mode: pigpio.OUTPUT }),
+  setForward: function() {
     engineRight.forward.writeSync(1);
     engineRight.backward.writeSync(0);
   },
-  setBackward: function(){
+  setBackward: function() {
     engineRight.forward.writeSync(0);
     engineRight.backward.writeSync(1);
   }
-}
-
-
+};
 
 let client;
 
