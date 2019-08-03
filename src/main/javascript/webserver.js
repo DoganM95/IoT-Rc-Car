@@ -43,12 +43,15 @@ let engine = {
     setSpeed: function(speed) {
       this.speed.pwmWrite(speed);
     }
-  }, 
+  },
   rightMotor: {
     forward: new gpio(13, {
       mode: pigpio.OUTPUT
     }),
     backward: new gpio(6, {
+      mode: pigpio.OUTPUT
+    }),
+    speed: new pigpio(20, {
       mode: pigpio.OUTPUT
     }),
     setForward: function() {
@@ -61,25 +64,19 @@ let engine = {
     }
   },
   avgMotor: {
-    getSpeed: function(){
+    getSpeed: function() {
       return (engine.leftMotor.speed.getPwmDutyCycle() + engine.rightMotor.speed.getPwmDutyCycle()) / 2;
     }
   }
 };
 
-
 //-----------------------------------------------------------------------------
-//Main - test
+//Main
 //-----------------------------------------------------------------------------
 
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
-  console.log(
-    "connection established from " +
-      socket.client.conn.remoteAddress +
-      " - " +
-      new Date().toUTCString()
-  );
+  console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
   clients.pop();
   clients.push(socket.client);
 
