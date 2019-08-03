@@ -77,7 +77,7 @@ servoRight.servoWrite(1500);
 
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
-  console.log("connection established from " + socket.client.conn.remoteAddress + " - " + Date.now());
+  console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
 
   // socket.on("connection", identityObject => {
   //   client = identityObject;
