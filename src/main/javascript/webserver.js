@@ -77,7 +77,7 @@ servoRight.servoWrite(1500);
 
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
-  console.log("connection established!");
+  console.log("connection established from "+ socket.client.conn.remoteAddress);
 
   // socket.on("connection", identityObject => {
   //   client = identityObject;
@@ -121,9 +121,7 @@ process.on("SIGINT", function() {
 //Functions
 //-----------------------------------------------------------------------------
 function httpHandler(req, res) {
-  //create server
   fs.readFile(__dirname + "/index.html", function(err, data) {
-    //read file index.html in public folder
     if (!err) {
       res.writeHead(200, { "Content-Type": "text/html" }); //write HTML
       res.write(data); //write data from index.html
