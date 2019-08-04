@@ -110,7 +110,7 @@ let engine = {
 //Main
 //-----------------------------------------------------------------------------
 (async () => {
-  engine.bothMotors.setPwmFrequency(5000);
+  engine.bothMotors.setPwmFrequency(20000);
   console.log("pwm range of left engine: " + engine.leftMotor.speed.getPwmRange());
   console.log("pwm range of right engine: " + engine.rightMotor.speed.getPwmRange());
   console.log("pwm freq of left engine: " + engine.leftMotor.speed.getPwmFrequency());
