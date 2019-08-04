@@ -154,7 +154,10 @@ let engine = {
               console.log("angle < " + clientAxisLimits.left + ", speeding out");
               engine.bothMotors.setSpeed(engine.avgMotor.getPwmRange());
             } else {
-              console.log("setting speed to " + (engine.avgMotor.getPwmRange() / clientAxisLimits.bottom) * angle);
+              console.log(
+                "setting speed to " +
+                  (engine.avgMotor.getPwmRange() / (clientAxisLimits.bottom - clientAxisLimits.deadzone.bottom)) * angle
+              );
               engine.bothMotors.setSpeed(Math.round((engine.avgMotor.getPwmRange() / clientAxisLimits.bottom) * angle));
             }
           } else if (angle > 5) {
@@ -162,7 +165,11 @@ let engine = {
             if (angle > clientAxisLimits.top) {
               engine.bothMotors.setSpeed(engine.avgMotor.getPwmRange());
             } else {
-              engine.bothMotors.setSpeed(Math.round((engine.avgMotor.getPwmRange() / clientAxisLimits.top) * angle));
+              engine.bothMotors.setSpeed(
+                Math.round(
+                  (engine.avgMotor.getPwmRange() / (clientAxisLimits.top - clientAxisLimits.deadzone.top)) * angle
+                )
+              );
             }
           } else {
             engine.bothMotors.setSpeed(0);
