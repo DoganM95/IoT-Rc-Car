@@ -8,7 +8,7 @@ let pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#ser
 let three = require("three"); //https://www.npmjs.com/package/three //
 
 // Module configs
-pigpioModule.configureClock(2, pigpio.CLOCK_PCM);
+pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
 let pigpio = pigpioModule.Gpio;
 
 //-----------------------------------------------------------------------------
