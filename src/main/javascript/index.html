@@ -78,6 +78,7 @@
     //---------------------------------------------------------------------
 
     socket.emit("steeringSocket", 1500); //initially center servo
+    socket.emit("axisLimits", axisLimits);
 
     window.addEventListener("load", function () {
       //DOM
@@ -89,7 +90,7 @@
       let servoLeftElement = document.getElementById("servoLeftButton");
       let servoRightElement = document.getElementById("servoRightButton");
 
-      socket.emit("axisLimits", axisLimits);
+      
 
       socket.on("motorSpeedSocket", data => {
         //when motor-speed changes, receive the speed via socket
