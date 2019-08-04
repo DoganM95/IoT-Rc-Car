@@ -43,7 +43,7 @@ let engine = {
       this.backward.digitalWrite(1);
     },
     setSpeed: function(speed) {
-      this.speed.pwmWrite(speed);
+      this.speed.pwmWrite(Math.abs(Math.round(speed)));
     }
   },
   rightMotor: {
@@ -65,7 +65,7 @@ let engine = {
       this.backward.digitalWrite(1);
     },
     setSpeed: function(speed) {
-      this.speed.pwmWrite(speed);
+      this.speed.pwmWrite(Math.abs(Math.round(speed)));
     }
   },
   bothMotors: {
@@ -150,7 +150,7 @@ let engine = {
               engine.bothMotors.setSpeed(engine.avgMotor.getPwmRange());
             } else {
               console.log("setting speed to " + (engine.avgMotor.getPwmRange() / clientAxisLimits.bottom) * angle);
-              engine.bothMotors.setSpeed(Math.round((engine.avgMotor.getPwmRange() / clientAxisLimits.top) * angle));
+              engine.bothMotors.setSpeed(Math.round((engine.avgMotor.getPwmRange() / clientAxisLimits.bottom) * angle));
             }
           } else if (angle > 5) {
             engine.bothMotors.setForward();
