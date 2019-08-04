@@ -11,6 +11,7 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 //-----------------------------------------------------------------------------
 let clients = [];
 let clientAxisLimits;
+let angle;
 
 let steering = {
   leftServo: new pigpio(23, { mode: pigpio.OUTPUT }),
@@ -138,9 +139,9 @@ let engine = {
           clientAxisLimits.right
       );
 
-      socket.on("engineSocket", subData => {
-        console.log("received engineSocketAngle: " + subData.angle);
-        let angle = subData.angle;
+      socket.on("engineSocket", gamma => {
+        console.log("speed-angle: " + gamma.angle);
+        angle = gamma.angle;
         try {
           if (angle < -5) {
             engine.bothMotors.setBackward();
@@ -162,7 +163,7 @@ let engine = {
             engine.bothMotors.setSpeed(0);
           }
         } catch (e) {
-          console.log("please refresh page " + e);
+          console.log(e);
         }
       });
     });
