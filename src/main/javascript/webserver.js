@@ -25,44 +25,44 @@ let steering = {
 
 let engine = {
   leftMotor: {
-    forward: new gpio(26, {
+    forward: new pigpio(26, {
       mode: pigpio.OUTPUT
     }),
-    backward: new gpio(19, {
+    backward: new pigpio(19, {
       mode: pigpio.OUTPUT
     }),
     speed: new pigpio(21, {
       mode: pigpio.OUTPUT
     }),
     setForward: function() {
-      this.forward.writeSync(1);
-      this.backward.writeSync(0);
+      this.forward.digitalWrite(1);
+      this.backward.digitalWrite(0);
     },
     setBackward: function() {
-      this.forward.writeSync(0);
-      this.backward.writeSync(1);
+      this.forward.digitalWrite(0);
+      this.backward.digitalWrite(1);
     },
     setSpeed: function(speed) {
       this.speed.pwmWrite(speed);
     }
   },
   rightMotor: {
-    forward: new gpio(13, {
+    forward: new pigpio(13, {
       mode: pigpio.OUTPUT
     }),
-    backward: new gpio(6, {
+    backward: new pigpio(6, {
       mode: pigpio.OUTPUT
     }),
     speed: new pigpio(20, {
       mode: pigpio.OUTPUT
     }),
     setForward: function() {
-      this.forward.writeSync(1);
-      this.backward.writeSync(0);
+      this.forward.digitalWrite(1);
+      this.backward.digitalWrite(0);
     },
     setBackward: function() {
-      this.forward.writeSync(0);
-      this.backward.writeSync(1);
+      this.forward.digitalWrite(0);
+      this.backward.digitalWrite(1);
     },
     setSpeed: function(speed) {
       this.speed.pwmWrite(speed);
@@ -70,16 +70,16 @@ let engine = {
   },
   bothMotors: {
     setForward: function() {
-      engine.rightMotor.forward.writeSync(1);
-      engine.leftMotor.forward.writeSync(1);
-      engine.rightMotor.backward.writeSync(0);
-      engine.leftMotor.backward.writeSync(0);
+      engine.rightMotor.forward.digitalWrite(1);
+      engine.leftMotor.forward.digitalWrite(1);
+      engine.rightMotor.backward.digitalWrite(0);
+      engine.leftMotor.backward.digitalWrite(0);
     },
     setBackward: function() {
-      engine.leftMotor.forward.writeSync(0);
-      engine.rightMotor.forward.writeSync(0);
-      engine.rightMotor.backward.writeSync(1);
-      engine.leftMotor.backward.writeSync(1);
+      engine.leftMotor.forward.digitalWrite(0);
+      engine.rightMotor.forward.digitalWrite(0);
+      engine.rightMotor.backward.digitalWrite(1);
+      engine.leftMotor.backward.digitalWrite(1);
     },
     setSpeed: function(speed) {
       engine.leftMotor.setSpeed(speed);
