@@ -103,16 +103,24 @@ console.log("pwm range of right engine: " + engine.rightMotor.speed.getPwmRange(
 console.log("pwm freq of left engine: " + engine.leftMotor.speed.getPwmFrequency());
 console.log("pwm freq of right engine: " + engine.rightMotor.speed.getPwmFrequency());
 
+socket.on("axisLimits", data => {
+  clientAxisLimits = data;
+  console.log(
+    "received axis limits: " +
+      clientAxisLimits.top +
+      "  " +
+      clientAxisLimits.bottom +
+      " " +
+      clientAxisLimits.left +
+      " " +
+      clientAxisLimits.right
+  );
+});
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
   console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
   clients.pop();
   clients.push(socket.client);
-
-  socket.on("axisLimits", data => {
-    clientAxisLimits = data;
-    console.log("received axis limits");
-  });
 
   socket.on("engineSocket", subData => {
     console.log("received engineSocketAngle: " + subData.angle);
