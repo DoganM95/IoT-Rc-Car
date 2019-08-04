@@ -150,7 +150,7 @@ let engine = {
               engine.bothMotors.setSpeed(engine.avgMotor.getPwmRange());
             } else {
               console.log("setting speed to " + (engine.avgMotor.getPwmRange() / clientAxisLimits.bottom) * angle);
-              engine.bothMotors.setSpeed(Math.round(engine.avgMotor.getPwmRange() / clientAxisLimits.bottom / angle));
+              engine.bothMotors.setSpeed(Math.round((engine.avgMotor.getPwmRange() / clientAxisLimits.top) * angle));
             }
           } else if (angle > 5) {
             engine.bothMotors.setForward();
