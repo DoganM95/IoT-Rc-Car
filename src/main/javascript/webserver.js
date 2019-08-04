@@ -110,7 +110,7 @@ io.sockets.on("connection", function(socket) {
   });
 
   socket.on("engineSocket", subData => {
-    console.log("received engineSocketAngle: " + subData);
+    console.log("received engineSocketAngle: " + subData.angle);
     let angle = subData.angle;
     if (angle < -5) {
       if (angle < clientAxisLimits.bottom) {
