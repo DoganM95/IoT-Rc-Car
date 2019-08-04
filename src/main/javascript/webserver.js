@@ -83,11 +83,24 @@ let engine = {
     setSpeed: function(speed) {
       engine.leftMotor.setSpeed(speed);
       engine.rightMotor.setSpeed(speed);
+    },
+    setPwmFrequency: function(hertz) {
+      engine.leftMotor.speed.pwmFrequency(hertz);
+      engine.rightMotor.speed.pwmFrequency(hertz);
     }
   },
   avgMotor: {
     getSpeed: function() {
       return (engine.leftMotor.speed.getPwmDutyCycle() + engine.rightMotor.speed.getPwmDutyCycle()) / 2;
+    },
+    getSpeed: function() {
+      return (engine.leftMotor.speed.getPwmDutyCycle() + engine.rightMotor.speed.getPwmDutyCycle()) / 2;
+    },
+    getPwmFrequency: function() {
+      return (engine.leftMotor.speed.getPwmFrequency() + engine.rightMotor.speed.getPwmFrequency()) / 2;
+    },
+    getPwmRange: function() {
+      return (engine.leftMotor.speed.getPwmRange() + engine.rightMotor.speed.getPwmRange()) / 2;
     }
   }
 };
@@ -96,6 +109,7 @@ let engine = {
 //Main
 //-----------------------------------------------------------------------------
 (async () => {
+  engine.bothMotors.setPwmFrequency(5000);
   console.log("pwm range of left engine: " + engine.leftMotor.speed.getPwmRange());
   console.log("pwm range of right engine: " + engine.rightMotor.speed.getPwmRange());
   console.log("pwm freq of left engine: " + engine.leftMotor.speed.getPwmFrequency());
@@ -110,13 +124,13 @@ let engine = {
     socket.on("axisLimits", data => {
       clientAxisLimits = data;
       console.log(
-        "received axis limits: " +
+        "received axis limits: top = " +
           clientAxisLimits.top +
-          "  " +
+          ", bottom = " +
           clientAxisLimits.bottom +
-          " " +
+          ", left = " +
           clientAxisLimits.left +
-          " " +
+          ", right = " +
           clientAxisLimits.right
       );
 
@@ -125,26 +139,20 @@ let engine = {
         let angle = subData.angle;
         try {
           if (angle < -5) {
+            engine.bothMotors.setBackward();
             if (angle < clientAxisLimits.bottom) {
               console.log("angle < " + clientAxisLimits.left + ", speeding out");
-              engine.bothMotors.setBackward();
-              engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
+              engine.bothMotors.setSpeed(engine.avgMotor.getPwmRange());
             } else {
-              console.log(
-                "setting speed to " + (engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom) * angle
-              );
-              engine.bothMotors.setSpeed(
-                Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle)
-              );
+              console.log("setting speed to " + (engine.avgMotor.getPwmRange() / clientAxisLimits.bottom) * angle);
+              engine.bothMotors.setSpeed(Math.round(engine.bothMotors.getPwmRange() / clientAxisLimits.bottom / angle));
             }
           } else if (angle > 5) {
+            engine.bothMotors.setForward();
             if (angle > clientAxisLimits.top) {
-              engine.bothMotors.setForward();
-              engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
+              engine.bothMotors.setSpeed(engine.bothMotors.getPwmRange());
             } else {
-              engine.bothMotors.setSpeed(
-                Math.round((engine.leftMotor.speed.getPwmRange() / clientAxisLimits.top) * angle)
-              );
+              engine.bothMotors.setSpeed(Math.round((engine.avgMotor.getPwmRange() / clientAxisLimits.top) * angle));
             }
           } else {
             engine.bothMotors.setSpeed(0);
