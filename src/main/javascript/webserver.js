@@ -130,7 +130,9 @@ let engine = {
               engine.bothMotors.setBackward();
               engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
             } else {
-              console.log("setting speed to " + engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle);
+              console.log(
+                "setting speed to " + (engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom) * angle
+              );
               engine.bothMotors.setSpeed(
                 Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle)
               );
@@ -141,14 +143,14 @@ let engine = {
               engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
             } else {
               engine.bothMotors.setSpeed(
-                Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.top / angle)
+                Math.round((engine.leftMotor.speed.getPwmRange() / clientAxisLimits.top) * angle)
               );
             }
           } else {
             engine.bothMotors.setSpeed(0);
           }
         } catch (e) {
-          console.log("please refreyh page " + e);
+          console.log("please refresh page " + e);
         }
       });
     });
@@ -173,7 +175,7 @@ console.log("waiting for connection on web-interface.");
 process.on("SIGINT", function() {
   //on ctrl+c
   console.log("killing server.");
-  motorLeft.pwmWrite(0); // Turn motorLeft off
+  engine.bothMotors.setSpeed(0);
   steering.setDirection(1500);
   process.exit(); //exit completely
 });
