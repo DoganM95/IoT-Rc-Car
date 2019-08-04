@@ -103,7 +103,7 @@ console.log("pwm range of right engine: " + engine.rightMotor.speed.getPwmRange(
 console.log("pwm freq of left engine: " + engine.leftMotor.speed.getPwmFrequency());
 console.log("pwm freq of right engine: " + engine.rightMotor.speed.getPwmFrequency());
 
-socket.on("axisLimits", data => {
+io.sockets.on("axisLimits", data => {
   clientAxisLimits = data;
   console.log(
     "received axis limits: " +
