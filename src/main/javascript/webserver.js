@@ -118,7 +118,11 @@ let engine = {
   //Server Socket listener
   io.sockets.on("connection", function(socket) {
     console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
-    clients.pop();
+    try {
+      clients.pop().conn.removeAllListeners();
+    } catch (e) {
+      console.log("no client to pop!");
+    }
     clients.push(socket.client);
 
     socket.on("axisLimits", data => {
