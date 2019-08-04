@@ -1,12 +1,16 @@
+// NPM Modules
 let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
 let https = require("https").createServer(httpHandler); //NEEDS FIX
 let fs = require("fs"); //require filesystem module
 let io = require("socket.io")(http); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
 let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
-let pigpio = require("pigpio").Gpio; //https://www.npmjs.com/package/pigpio#servo-control //include pigpio to enable pulse width modulation for servo
+let pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //include pigpio to enable pulse width modulation for servo
 let three = require("three"); //https://www.npmjs.com/package/three //
 
-pigpio.configureClock(2, pigpio.CLOCK_PCM);
+// Module configs
+pigpioModule.configureClock(2, pigpio.CLOCK_PCM);
+let pigpio = pigpioModule.Gpio;
+
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
