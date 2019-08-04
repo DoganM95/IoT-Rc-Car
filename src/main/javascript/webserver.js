@@ -98,6 +98,11 @@ engine.rightMotor.speed.pwm;
 //Main
 //-----------------------------------------------------------------------------
 
+console.log("pwm range of left engine: " + engine.leftMotor.speed.getPwmRange());
+console.log("pwm range of right engine: " + engine.rightMotor.speed.getPwmRange());
+console.log("pwm freq of left engine: " + engine.leftMotor.speed.getPwmFrequency());
+console.log("pwm freq of right engine: " + engine.rightMotor.speed.getPwmFrequency());
+
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
   console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
