@@ -6,6 +6,7 @@ let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gp
 let pigpio = require("pigpio").Gpio; //https://www.npmjs.com/package/pigpio#servo-control //include pigpio to enable pulse width modulation for servo
 let three = require("three"); //https://www.npmjs.com/package/three //
 
+pigpio.configureClock(2, pigpio.CLOCK_PCM);
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
