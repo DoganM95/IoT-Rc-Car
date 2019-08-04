@@ -105,28 +105,30 @@ io.sockets.on("connection", function(socket) {
   clients.push(socket.client);
   socket.on("axisLimits", data => {
     clientAxisLimits = data;
+    socket.on("engineSocket", subData => {
+      let angle = subData.angle;
+      if (angle < -5) {
+        if (angle < clientAxisLimits.bottom) {
+          engine.bothMotors.setBackward();
+          engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
+        } else {
+          engine.bothMotors.setSpeed(
+            Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle)
+          );
+        }
+      } else if (angle > 5) {
+        if (angle > clientAxisLimits.top) {
+          engine.bothMotors.setForward();
+          engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
+        } else {
+          engine.bothMotors.setSpeed(Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.top / angle));
+        }
+      } else {
+        engine.bothMotors.setSpeed(0);
+      }
+    });
   });
 
-  socket.on("engineSocket", data => {
-    let angle = data.angle;
-    if (angle < -5) {
-      if (angle < clientAxisLimits.bottom) {
-        engine.bothMotors.setBackward();
-        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
-      } else {
-        engine.bothMotors.setSpeed(Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle));
-      }
-    } else if (angle > 5) {
-      if (angle > clientAxisLimits.top) {
-        engine.bothMotors.setForward();
-        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
-      } else {
-        engine.bothMotors.setSpeed(Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.top / angle));
-      }
-    } else {
-      engine.bothMotors.setSpeed(0);
-    }
-  });
   socket.on("engineLeftSocket", data => {});
   socket.on("engineRightSocket", data => {});
   socket.on("steeringSocket", data => {
