@@ -35,12 +35,12 @@ let engine = {
       mode: pigpio.OUTPUT
     }),
     setForward: function() {
-      engineLeft.forward.writeSync(1);
-      engineLeft.backward.writeSync(0);
+      this.forward.writeSync(1);
+      this.backward.writeSync(0);
     },
     setBackward: function() {
-      engineLeft.forward.writeSync(0);
-      engineLeft.backward.writeSync(1);
+      this.forward.writeSync(0);
+      this.backward.writeSync(1);
     },
     setSpeed: function(speed) {
       this.speed.pwmWrite(speed);
@@ -57,12 +57,12 @@ let engine = {
       mode: pigpio.OUTPUT
     }),
     setForward: function() {
-      engineRight.forward.writeSync(1);
-      engineRight.backward.writeSync(0);
+      this.forward.writeSync(1);
+      this.backward.writeSync(0);
     },
     setBackward: function() {
-      engineRight.forward.writeSync(0);
-      engineRight.backward.writeSync(1);
+      this.forward.writeSync(0);
+      this.backward.writeSync(1);
     },
     setSpeed: function(speed) {
       this.speed.pwmWrite(speed);
@@ -70,16 +70,16 @@ let engine = {
   },
   bothMotors: {
     setForward: function() {
-      engineRight.forward.writeSync(1);
-      engineLeft.forward.writeSync(1);
-      engineRight.backward.writeSync(0);
-      engineLeft.backward.writeSync(0);
+      engine.rightMotor.forward.writeSync(1);
+      engine.leftMotor.forward.writeSync(1);
+      engine.rightMotor.backward.writeSync(0);
+      engine.leftMotor.backward.writeSync(0);
     },
     setBackward: function() {
-      engineLeft.forward.writeSync(0);
-      engineRight.forward.writeSync(0);
-      engineRight.backward.writeSync(1);
-      engineLeft.backward.writeSync(1);
+      engine.leftMotor.forward.writeSync(0);
+      engine.rightMotor.forward.writeSync(0);
+      engine.rightMotor.backward.writeSync(1);
+      engine.leftMotor.backward.writeSync(1);
     },
     setSpeed: function(speed) {
       engine.leftMotor.setSpeed(speed);
