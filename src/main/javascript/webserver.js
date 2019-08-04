@@ -103,34 +103,34 @@ io.sockets.on("connection", function(socket) {
   console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
   clients.pop();
   clients.push(socket.client);
+
   socket.on("axisLimits", data => {
     clientAxisLimits = data;
     console.log("received axis limits");
-    socket.on("engineSocket", subData => {
-      console.log("received engineSocketAngle: " + subData);
-      let angle = subData.angle;
-      if (angle < -5) {
-        if (angle < clientAxisLimits.bottom) {
-          console.log("angle < " + clientAxisLimits.left + ", speeding out");
-          engine.bothMotors.setBackward();
-          engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
-        } else {
-          console.log("setting speed to " + engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle);
-          engine.bothMotors.setSpeed(
-            Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle)
-          );
-        }
-      } else if (angle > 5) {
-        if (angle > clientAxisLimits.top) {
-          engine.bothMotors.setForward();
-          engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
-        } else {
-          engine.bothMotors.setSpeed(Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.top / angle));
-        }
+  });
+
+  socket.on("engineSocket", subData => {
+    console.log("received engineSocketAngle: " + subData);
+    let angle = subData.angle;
+    if (angle < -5) {
+      if (angle < clientAxisLimits.bottom) {
+        console.log("angle < " + clientAxisLimits.left + ", speeding out");
+        engine.bothMotors.setBackward();
+        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
       } else {
-        engine.bothMotors.setSpeed(0);
+        console.log("setting speed to " + engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle);
+        engine.bothMotors.setSpeed(Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.bottom / angle));
       }
-    });
+    } else if (angle > 5) {
+      if (angle > clientAxisLimits.top) {
+        engine.bothMotors.setForward();
+        engine.bothMotors.setSpeed(engine.leftMotor.speed.getPwmRange());
+      } else {
+        engine.bothMotors.setSpeed(Math.round(engine.leftMotor.speed.getPwmRange() / clientAxisLimits.top / angle));
+      }
+    } else {
+      engine.bothMotors.setSpeed(0);
+    }
   });
 
   socket.on("engineLeftSocket", data => {});
