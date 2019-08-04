@@ -16,7 +16,7 @@ git checkout dev
 git pull
 #sudo npm start &
 # sudo npm run $NPMRUN &
-npm start &
+sudo npm start &
 zenity --info --text "Startet Server" &
 #xterm -e 'bash -c "echo server is up;sleep 10"' &>/dev/null &
 
@@ -43,7 +43,7 @@ while :; do
 	sudo killall node
 	git pull
 	# sudo npm run $NPMRUN &
-    npm start &
+    sudo npm start &
     elif [ $REMOTE = $BASE ]; then
         echo $(timestamp) "Pushing local changes to remote.."
 	git pull
