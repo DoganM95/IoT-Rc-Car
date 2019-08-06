@@ -10,21 +10,21 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 // Module configs
 pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
 let pigpio = pigpioModule.Gpio;
-
+import { thisClient as client } from "./index.html";
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
 let clients = {
   current: {
     identity: new Object(),
-    settings: {
-      axisLimits: new Object()
-    },
-    sensors: {
-      deviceorientation: {
-        alpha: 0,
-        beta: 0,
-        gamma: 0
+    settings: client.settings,
+    state: {
+      sensors: {
+        deviceorientation: {
+          alpha: 0,
+          beta: 0,
+          gamma: 0
+        }
       }
     }
   },
@@ -143,13 +143,15 @@ console.log("pwm freq of right car.engine: " + car.engine.rightMotor.speed.getPw
 
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
-  console.log("connection established from " + socket.clients.conn.remoteAddress + " - " + new Date().toUTCString());
+  console.log("Connected: " + socket.clients.conn.remoteAddress + " - " + new Date().toUTCString());
   try {
     clients.predecessor.identity.conn.removeAllListeners();
   } catch (e) {
     console.log("no client to pop!");
   }
+  clients.predecessor.identity = clients.list[clients.list.length - 1];
   clients.current.identity = socket.client;
+  clients.list.push(socket.client);
 
   socket.on("axisLimits", data => {
     clients.current.settings.axisLimits = data;
@@ -213,8 +215,6 @@ io.sockets.on("connection", function(socket) {
     });
   });
 
-  socket.on("engineLeftSocket", data => {});
-  socket.on("engineRightSocket", data => {});
   socket.on("steeringSocket", data => {
     car.steering.setDirection(data);
     socket.emit(

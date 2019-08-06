@@ -59,8 +59,7 @@
         }
       };
 
-
-      let thisClient = {
+      export let thisClient = {
         settings: {
           axisLimits: {
             left: -30,
@@ -76,8 +75,6 @@
           }
         }
       };
-
-      let ;
 
       //---------------------------------------------------------------------
       // MAIN
@@ -99,12 +96,16 @@
         socket.on("motorSpeedSocket", data => {
           //when motor-speed changes, receive the speed via socket
           thisClient.car.engine.speed.value = data; //set thisClient.car.engine.speed.value's value to the current speed
-          console.log("received current thisClient.car.engine.speed.value via socket: " + thisClient.car.engine.speed.value);
+          console.log(
+            "received current thisClient.car.engine.speed.value via socket: " + thisClient.car.engine.speed.value
+          );
         });
 
         socket.on("servoAngleSocket", data => {
           thisClient.car.steering.angle.value = data;
-          console.log("received current thisClient.car.steering.angle.value via Socket: " + thisClient.car.steering.angle.value);
+          console.log(
+            "received current thisClient.car.steering.angle.value via Socket: " + thisClient.car.steering.angle.value
+          );
         });
 
         document.addEventListener("keydown", async key => {
@@ -133,13 +134,19 @@
             //Servo direction control
             case 39: //key right
               if (thisClient.car.steering.angle.value > 500) {
-                socket.emit("steeringSocket", thisClient.car.steering.angle.value - thisClient.car.steering.angle.increment);
+                socket.emit(
+                  "steeringSocket",
+                  thisClient.car.steering.angle.value - thisClient.car.steering.angle.increment
+                );
                 thisClient.car.steering.angle.value -= thisClient.car.steering.angle.increment;
               }
               break;
             case 37: //key left
               if (thisClient.car.steering.angle.value < 2500) {
-                socket.emit("steeringSocket", thisClient.car.steering.angle.value + thisClient.car.steering.angle.increment);
+                socket.emit(
+                  "steeringSocket",
+                  thisClient.car.steering.angle.value + thisClient.car.steering.angle.increment
+                );
                 thisClient.car.steering.angle.value += thisClient.car.steering.angle.increment;
               }
               break;
