@@ -43,7 +43,7 @@
       //CONNECTION
       var socket = io(); //load socket.io-client and connect to the host that serves the page
 
-      //VARS
+      //VARSlel
       let semaphore = {
         speed: {
           free: true
@@ -193,7 +193,6 @@
             }
           }
 
-          //beta (steering) is between -30 and 30 in axis
           //servo angle can be between 500 (== 90°(deg)) and 2500 (== -90°(deg))
           else if (property == "steering") {
             //in case function gets steering param
