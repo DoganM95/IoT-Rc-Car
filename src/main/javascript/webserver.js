@@ -10,7 +10,7 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 // Module configs
 pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
 let pigpio = pigpioModule.Gpio;
-import { thisClient as client } from "./index.html";
+import * as client from "./index.html";
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
