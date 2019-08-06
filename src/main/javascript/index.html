@@ -36,6 +36,24 @@
       <p id="steering-angle"></p>
     </div>
 
+    <script type="module">
+      export let thisClient = {
+        settings: {
+          axisLimits: {
+            left: -30,
+            right: 30,
+            top: 55,
+            bottom: -55,
+            deadzone: {
+              left: 0,
+              right: 0,
+              top: 5,
+              bottom: -5
+            }
+          }
+        }
+      };
+    </script>
     <script>
       //---------------------------------------------------------------------
       //Global Vars
@@ -56,23 +74,6 @@
           right: true,
           up: true,
           down: true
-        }
-      };
-
-      export let thisClient = {
-        settings: {
-          axisLimits: {
-            left: -30,
-            right: 30,
-            top: 55,
-            bottom: -55,
-            deadzone: {
-              left: 0,
-              right: 0,
-              top: 5,
-              bottom: -5
-            }
-          }
         }
       };
 
