@@ -14,183 +14,215 @@ let pigpio = pigpioModule.Gpio;
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
-let clients = [];
-let clientAxisLimits;
-let angle;
-
-let steering = {
-  leftServo: new pigpio(23, { mode: pigpio.OUTPUT }),
-  rightServo: new pigpio(24, { mode: pigpio.OUTPUT }),
-  setDirection: function(angle) {
-    //Syncing algorithm comes here
-    this.leftServo.servoWrite(angle);
-    this.rightServo.servoWrite(angle);
-  }
+let clients = {
+  current: {
+    identity: new Object(),
+    settings: {
+      axisLimits: new Object()
+    },
+    sensors: {
+      deviceorientation: {
+        alpha: 0,
+        beta: 0,
+        gamma: 0
+      }
+    }
+  },
+  predecessor: {
+    identity: new Object()
+  },
+  list: []
 };
 
-let engine = {
-  leftMotor: {
-    forward: new pigpio(26, {
-      mode: pigpio.OUTPUT
-    }),
-    backward: new pigpio(19, {
-      mode: pigpio.OUTPUT
-    }),
-    speed: new pigpio(21, {
-      mode: pigpio.OUTPUT
-    }),
-    setForward: function() {
-      this.forward.digitalWrite(1);
-      this.backward.digitalWrite(0);
-    },
-    setBackward: function() {
-      this.forward.digitalWrite(0);
-      this.backward.digitalWrite(1);
-    },
-    setSpeed: function(speed) {
-      this.speed.pwmWrite(Math.abs(Math.round(speed)));
+let car = {
+  steering: {
+    leftServo: new pigpio(23, { mode: pigpio.OUTPUT }),
+    rightServo: new pigpio(24, { mode: pigpio.OUTPUT }),
+    setDirection: function(angle) {
+      //Syncing algorithm comes here
+      this.leftServo.servoWrite(angle);
+      this.rightServo.servoWrite(angle);
     }
   },
-  rightMotor: {
-    forward: new pigpio(13, {
-      mode: pigpio.OUTPUT
-    }),
-    backward: new pigpio(6, {
-      mode: pigpio.OUTPUT
-    }),
-    speed: new pigpio(20, {
-      mode: pigpio.OUTPUT
-    }),
-    setForward: function() {
-      this.forward.digitalWrite(1);
-      this.backward.digitalWrite(0);
+  engine: {
+    leftMotor: {
+      forward: new pigpio(26, {
+        mode: pigpio.OUTPUT
+      }),
+      backward: new pigpio(19, {
+        mode: pigpio.OUTPUT
+      }),
+      speed: new pigpio(21, {
+        mode: pigpio.OUTPUT
+      }),
+      setForward: function() {
+        this.forward.digitalWrite(1);
+        this.backward.digitalWrite(0);
+      },
+      setBackward: function() {
+        this.forward.digitalWrite(0);
+        this.backward.digitalWrite(1);
+      },
+      setSpeed: function(speed) {
+        this.speed.pwmWrite(Math.abs(Math.round(speed)));
+      }
     },
-    setBackward: function() {
-      this.forward.digitalWrite(0);
-      this.backward.digitalWrite(1);
+    rightMotor: {
+      forward: new pigpio(13, {
+        mode: pigpio.OUTPUT
+      }),
+      backward: new pigpio(6, {
+        mode: pigpio.OUTPUT
+      }),
+      speed: new pigpio(20, {
+        mode: pigpio.OUTPUT
+      }),
+      setForward: function() {
+        this.forward.digitalWrite(1);
+        this.backward.digitalWrite(0);
+      },
+      setBackward: function() {
+        this.forward.digitalWrite(0);
+        this.backward.digitalWrite(1);
+      },
+      setSpeed: function(speed) {
+        this.speed.pwmWrite(Math.abs(Math.round(speed)));
+      }
     },
-    setSpeed: function(speed) {
-      this.speed.pwmWrite(Math.abs(Math.round(speed)));
+    bothMotors: {
+      setForward: function() {
+        car.engine.rightMotor.forward.digitalWrite(1);
+        car.engine.leftMotor.forward.digitalWrite(1);
+        car.engine.rightMotor.backward.digitalWrite(0);
+        car.engine.leftMotor.backward.digitalWrite(0);
+      },
+      setBackward: function() {
+        car.engine.leftMotor.forward.digitalWrite(0);
+        car.engine.rightMotor.forward.digitalWrite(0);
+        car.engine.rightMotor.backward.digitalWrite(1);
+        car.engine.leftMotor.backward.digitalWrite(1);
+      },
+      setSpeed: function(speed) {
+        car.engine.leftMotor.setSpeed(speed);
+        car.engine.rightMotor.setSpeed(speed);
+      },
+      setPwmFrequency: function(hertz) {
+        car.engine.leftMotor.speed.pwmFrequency(hertz);
+        car.engine.rightMotor.speed.pwmFrequency(hertz);
+      }
+    },
+    avgMotor: {
+      getSpeed: function() {
+        return (car.engine.leftMotor.speed.getPwmDutyCycle() + car.engine.rightMotor.speed.getPwmDutyCycle()) / 2;
+      },
+      getSpeed: function() {
+        return (car.engine.leftMotor.speed.getPwmDutyCycle() + car.engine.rightMotor.speed.getPwmDutyCycle()) / 2;
+      },
+      getPwmFrequency: function() {
+        return (car.engine.leftMotor.speed.getPwmFrequency() + car.engine.rightMotor.speed.getPwmFrequency()) / 2;
+      },
+      getPwmRange: function() {
+        return (car.engine.leftMotor.speed.getPwmRange() + car.engine.rightMotor.speed.getPwmRange()) / 2;
+      }
     }
   },
-  bothMotors: {
-    setForward: function() {
-      engine.rightMotor.forward.digitalWrite(1);
-      engine.leftMotor.forward.digitalWrite(1);
-      engine.rightMotor.backward.digitalWrite(0);
-      engine.leftMotor.backward.digitalWrite(0);
-    },
-    setBackward: function() {
-      engine.leftMotor.forward.digitalWrite(0);
-      engine.rightMotor.forward.digitalWrite(0);
-      engine.rightMotor.backward.digitalWrite(1);
-      engine.leftMotor.backward.digitalWrite(1);
-    },
-    setSpeed: function(speed) {
-      engine.leftMotor.setSpeed(speed);
-      engine.rightMotor.setSpeed(speed);
-    },
-    setPwmFrequency: function(hertz) {
-      engine.leftMotor.speed.pwmFrequency(hertz);
-      engine.rightMotor.speed.pwmFrequency(hertz);
-    }
-  },
-  avgMotor: {
-    getSpeed: function() {
-      return (engine.leftMotor.speed.getPwmDutyCycle() + engine.rightMotor.speed.getPwmDutyCycle()) / 2;
-    },
-    getSpeed: function() {
-      return (engine.leftMotor.speed.getPwmDutyCycle() + engine.rightMotor.speed.getPwmDutyCycle()) / 2;
-    },
-    getPwmFrequency: function() {
-      return (engine.leftMotor.speed.getPwmFrequency() + engine.rightMotor.speed.getPwmFrequency()) / 2;
-    },
-    getPwmRange: function() {
-      return (engine.leftMotor.speed.getPwmRange() + engine.rightMotor.speed.getPwmRange()) / 2;
-    }
+  sensors: {
+    speed: undefined,
+    distance: undefined
   }
 };
 
 //-----------------------------------------------------------------------------
 //Main
 //-----------------------------------------------------------------------------
-(async () => {
-  engine.bothMotors.setPwmFrequency(20000);
-  console.log("pwm range of left engine: " + engine.leftMotor.speed.getPwmRange());
-  console.log("pwm range of right engine: " + engine.rightMotor.speed.getPwmRange());
-  console.log("pwm freq of left engine: " + engine.leftMotor.speed.getPwmFrequency());
-  console.log("pwm freq of right engine: " + engine.rightMotor.speed.getPwmFrequency());
+car.engine.bothMotors.setPwmFrequency(20000);
+console.log("pwm range of left car.engine: " + car.engine.leftMotor.speed.getPwmRange());
+console.log("pwm range of right car.engine: " + car.engine.rightMotor.speed.getPwmRange());
+console.log("pwm freq of left car.engine: " + car.engine.leftMotor.speed.getPwmFrequency());
+console.log("pwm freq of right car.engine: " + car.engine.rightMotor.speed.getPwmFrequency());
 
-  //Server Socket listener
-  io.sockets.on("connection", function(socket) {
-    console.log("connection established from " + socket.client.conn.remoteAddress + " - " + new Date().toUTCString());
-    try {
-      clients.pop().conn.removeAllListeners();
-    } catch (e) {
-      console.log("no client to pop!");
-    }
-    clients.push(socket.client);
+//Server Socket listener
+io.sockets.on("connection", function(socket) {
+  console.log("connection established from " + socket.clients.conn.remoteAddress + " - " + new Date().toUTCString());
+  try {
+    clients.predecessor.identity.conn.removeAllListeners();
+  } catch (e) {
+    console.log("no client to pop!");
+  }
+  clients.current.identity = socket.client;
 
-    socket.on("axisLimits", data => {
-      clientAxisLimits = data;
-      console.log(
-        "received axis limits: top = " +
-          clientAxisLimits.top +
-          ", bottom = " +
-          clientAxisLimits.bottom +
-          ", left = " +
-          clientAxisLimits.left +
-          ", right = " +
-          clientAxisLimits.right
-      );
+  socket.on("axisLimits", data => {
+    clients.current.settings.axisLimits = data;
+    console.log(
+      "received axis limits: top = " +
+        clients.current.settings.axisLimits.top +
+        ", bottom = " +
+        clients.current.settings.axisLimits.bottom +
+        ", left = " +
+        clients.current.settings.axisLimits.left +
+        ", right = " +
+        clients.current.settings.axisLimits.right
+    );
 
-      socket.on("engineSocket", gamma => {
-        console.log("speed-angle: " + gamma.angle);
-        angle = gamma.angle;
-        try {
-          if (angle < -5) {
-            engine.bothMotors.setBackward();
-            if (angle < clientAxisLimits.bottom) {
-              console.log("angle < " + clientAxisLimits.left + ", speeding out");
-              engine.bothMotors.setSpeed(engine.avgMotor.getPwmRange());
-            } else {
-              console.log(
-                "setting speed to " +
-                  (engine.avgMotor.getPwmRange() / (clientAxisLimits.bottom - clientAxisLimits.deadzone.bottom)) * angle
-              );
-              engine.bothMotors.setSpeed(Math.round((engine.avgMotor.getPwmRange() / clientAxisLimits.bottom) * angle));
-            }
-          } else if (angle > 5) {
-            engine.bothMotors.setForward();
-            if (angle > clientAxisLimits.top) {
-              engine.bothMotors.setSpeed(engine.avgMotor.getPwmRange());
-            } else {
-              engine.bothMotors.setSpeed(
-                Math.round(
-                  (engine.avgMotor.getPwmRange() / (clientAxisLimits.top - clientAxisLimits.deadzone.top)) * angle
-                )
-              );
-            }
+    socket.on("engineSocket", gamma => {
+      console.log("speed-angle: " + gamma.angle);
+      clients.current.sensors.deviceorientation.gamma = gamma.angle;
+      try {
+        if (clients.current.sensors.deviceorientation.gamma < -5) {
+          car.engine.bothMotors.setBackward();
+          if (clients.current.sensors.deviceorientation.gamma < clients.current.settings.axisLimits.bottom) {
+            console.log(
+              "clients.current.sensors.deviceorientation.gamma < " +
+                clients.current.settings.axisLimits.left +
+                ", speeding out"
+            );
+            car.engine.bothMotors.setSpeed(car.engine.avgMotor.getPwmRange());
           } else {
-            engine.bothMotors.setSpeed(0);
+            console.log(
+              "setting speed to " +
+                (car.engine.avgMotor.getPwmRange() /
+                  (clients.current.settings.axisLimits.bottom - clients.current.settings.axisLimits.deadzone.bottom)) *
+                  clients.current.sensors.deviceorientation.gamma
+            );
+            car.engine.bothMotors.setSpeed(
+              Math.round(
+                (car.engine.avgMotor.getPwmRange() / clients.current.settings.axisLimits.bottom) *
+                  clients.current.sensors.deviceorientation.gamma
+              )
+            );
           }
-        } catch (e) {
-          console.log(e);
+        } else if (clients.current.sensors.deviceorientation.gamma > 5) {
+          car.engine.bothMotors.setForward();
+          if (clients.current.sensors.deviceorientation.gamma > clients.current.settings.axisLimits.top) {
+            car.engine.bothMotors.setSpeed(car.engine.avgMotor.getPwmRange());
+          } else {
+            car.engine.bothMotors.setSpeed(
+              Math.round(
+                (car.engine.avgMotor.getPwmRange() /
+                  (clients.current.settings.axisLimits.top - clients.current.settings.axisLimits.deadzone.top)) *
+                  clients.current.sensors.deviceorientation.gamma
+              )
+            );
+          }
+        } else {
+          car.engine.bothMotors.setSpeed(0);
         }
-      });
-    });
-
-    socket.on("engineLeftSocket", data => {});
-    socket.on("engineRightSocket", data => {});
-    socket.on("steeringSocket", data => {
-      steering.setDirection(data);
-      socket.emit(
-        "servoSocket",
-        (steering.leftServo.getServoPulseWidth() + steering.rightServo.getServoPulseWidth()) / 2
-      );
+      } catch (e) {
+        console.log(e);
+      }
     });
   });
-})();
+
+  socket.on("engineLeftSocket", data => {});
+  socket.on("engineRightSocket", data => {});
+  socket.on("steeringSocket", data => {
+    car.steering.setDirection(data);
+    socket.emit(
+      "servoSocket",
+      (car.steering.leftServo.getServoPulseWidth() + car.steering.rightServo.getServoPulseWidth()) / 2
+    );
+  });
+});
 
 //Server
 http.listen(8080); //listen to port 8080
@@ -200,8 +232,8 @@ console.log("waiting for connection on web-interface.");
 process.on("SIGINT", function() {
   //on ctrl+c
   console.log("killing server.");
-  engine.bothMotors.setSpeed(0);
-  steering.setDirection(1500);
+  car.engine.bothMotors.setSpeed(0);
+  car.steering.setDirection(1500);
   process.exit(); //exit completely
 });
 
