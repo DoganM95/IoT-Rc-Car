@@ -146,6 +146,7 @@ console.log("pwm freq of right car.engine: " + car.engine.rightMotor.speed.getPw
 io.sockets.on("connection", function(socket) {
   try {
     clients.predecessor.identity.conn.removeAllListeners();
+    console.log("Disconnected: " + clients.predecessor.identity.conn.remoteAddress);
   } catch (e) {
     console.log("no client to pop!");
   }
