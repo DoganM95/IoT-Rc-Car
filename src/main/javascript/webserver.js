@@ -156,6 +156,7 @@ io.sockets.on("connection", function(socket) {
   console.log("Connected: " + clients.current.identity.conn.remoteAddress + " - " + new Date().toUTCString());
 
   socket.on("axisLimits", data => {
+    console.log("data rec: " + data);
     try {
       clients.current.settings.axisLimits = data;
       console.log(
