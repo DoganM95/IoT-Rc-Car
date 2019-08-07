@@ -18,7 +18,7 @@ let pigpio = pigpioModule.Gpio;
 let clients = {
   current: {
     identity: new Object(),
-    settings: client.settings,
+    settings: new Object(),
     state: {
       sensors: {
         deviceorientation: {
