@@ -10,7 +10,8 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 // Module configs
 pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
 let pigpio = pigpioModule.Gpio;
-import * as client from "./index.html";
+import { thisClient as client } from "./index.html";
+
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
@@ -225,7 +226,7 @@ io.sockets.on("connection", function(socket) {
 });
 
 //Server
-http.listen(8080); //listen to port 8080
+http.listen(16207); //listen to port 8080
 console.log("waiting for connection on web-interface.");
 
 //Event Listener
