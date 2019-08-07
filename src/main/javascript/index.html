@@ -59,7 +59,7 @@
         }
       };
 
-      export let thisClient = {
+      let thisClient = {
         settings: {
           axisLimits: {
             left: -30,
@@ -79,9 +79,6 @@
       // MAIN
       //---------------------------------------------------------------------
 
-      socket.emit("steeringSocket", thisClient.car.steering.angle.value); //initially center servo
-      socket.emit("axisLimits", thisClient.settings.axisLimits);
-
       window.addEventListener("load", function() {
         //DOM
         const alpha = document.getElementById("alpha");
@@ -91,6 +88,9 @@
         let motor = document.getElementById("motorState");
         let servoLeftElement = document.getElementById("servoLeftButton");
         let servoRightElement = document.getElementById("servoRightButton");
+
+        socket.emit("steeringSocket", thisClient.car.steering.angle.value); //initially center servo
+        socket.emit("axisLimits", thisClient.settings.axisLimits);
 
         socket.on("motorSpeedSocket", data => {
           //when motor-speed changes, receive the speed via socket
