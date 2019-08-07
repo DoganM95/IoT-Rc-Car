@@ -144,7 +144,6 @@ console.log("pwm freq of right car.engine: " + car.engine.rightMotor.speed.getPw
 
 //Server Socket listener
 io.sockets.on("connection", function(socket) {
-  console.log("Connected: " + socket.clients.conn.remoteAddress + " - " + new Date().toUTCString());
   try {
     clients.predecessor.identity.conn.removeAllListeners();
   } catch (e) {
@@ -153,6 +152,7 @@ io.sockets.on("connection", function(socket) {
   clients.predecessor.identity = clients.list[clients.list.length - 1];
   clients.current.identity = socket.client;
   clients.list.push(socket.client);
+  console.log("Connected: " + clients.current.identity.conn.remoteAddress + " - " + new Date().toUTCString());
 
   socket.on("axisLimits", data => {
     clients.current.settings.axisLimits = data;
