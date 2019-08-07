@@ -156,17 +156,21 @@ io.sockets.on("connection", function(socket) {
   console.log("Connected: " + clients.current.identity.conn.remoteAddress + " - " + new Date().toUTCString());
 
   socket.on("axisLimits", data => {
-    clients.current.settings.axisLimits = data;
-    console.log(
-      "received axis limits: top = " +
-        clients.current.settings.axisLimits.top +
-        ", bottom = " +
-        clients.current.settings.axisLimits.bottom +
-        ", left = " +
-        clients.current.settings.axisLimits.left +
-        ", right = " +
-        clients.current.settings.axisLimits.right
-    );
+    try {
+      clients.current.settings.axisLimits = data;
+      console.log(
+        "received axis limits: top = " +
+          clients.current.settings.axisLimits.top +
+          ", bottom = " +
+          clients.current.settings.axisLimits.bottom +
+          ", left = " +
+          clients.current.settings.axisLimits.left +
+          ", right = " +
+          clients.current.settings.axisLimits.right
+      );
+    } catch (e) {
+      console.log(e);
+    }
 
     socket.on("engineSocket", gamma => {
       console.log("speed-angle: " + gamma.angle);
