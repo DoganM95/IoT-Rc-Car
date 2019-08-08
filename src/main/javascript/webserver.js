@@ -24,8 +24,11 @@ let https = httpsModule.createServer(
     //Generate the needed keys:
     //openssl req -nodes -new -x509 -keyout server.key -out server.cert
     //Can skip all except COMMON NAME and EMAIL
-    key: fs.readFileSync(__dirname + "/certs/server.cert"),
-    cert: fs.readFileSync(__dirname + "/certs/server.key")
+
+    //openssl req -newkey rsa:2048 -new -nodes -keyout key.pem -out csr.pem
+    //openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out server.crt
+    key: fs.readFileSync(__dirname + "/certs/csr.pem", "utf8"),
+    cert: fs.readFileSync(__dirname + "/certs/server.crt", "utf8")
   },
   httpHandler
 );
