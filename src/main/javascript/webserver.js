@@ -8,7 +8,7 @@
 
 // NPM Modules
 let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
-let https = require("https").createServer(httpHandler); //NEEDS FIX
+let https = require("https").createServer(options, httpHandler); //NEEDS FIX
 let fs = require("fs"); //require filesystem module
 let io = require("socket.io")(http); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
 let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
