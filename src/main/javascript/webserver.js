@@ -23,6 +23,11 @@ let pigpio = pigpioModule.Gpio;
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
+const options = {
+  key: fs.readFileSync("./certs/rc.key"),
+  cert: fs.readFileSync("./certs/rc.cert")
+};
+
 let clients = {
   current: {
     identity: new Object(),
