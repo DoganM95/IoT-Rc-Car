@@ -1,3 +1,11 @@
+//Connection:
+//
+//Internal:
+//ssh pi@192.168.0.169:16 -p 16207
+//
+//External
+//ssh pi@pi-rc.ddns.net -p 28342
+
 // NPM Modules
 let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
 let https = require("https").createServer(httpHandler); //NEEDS FIX
