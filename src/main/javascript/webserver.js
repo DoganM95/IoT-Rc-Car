@@ -21,8 +21,8 @@ let pigpio = pigpioModule.Gpio;
 
 let https = httpsModule.createServer(
   {
-    key: fs.readFileSync("./certs/rc.key"),
-    cert: fs.readFileSync("./certs/rc.cert")
+    key: fs.readFileSync(__dirname + "/certs/rc.cert"),
+    cert: fs.readFileSync(__dirname + "/certs/rc.key")
   },
   httpHandler
 );
