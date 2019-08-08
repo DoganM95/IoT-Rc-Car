@@ -8,7 +8,7 @@
 
 // NPM Modules
 let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
-let https = require("https").createServer(options, httpHandler); //NEEDS FIX
+let httpsModule = require("https"); //NEEDS FIX
 let fs = require("fs"); //require filesystem module
 let io = require("socket.io")(http); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
 let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
@@ -18,15 +18,20 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 // Module configs
 pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
 let pigpio = pigpioModule.Gpio;
+
+let https = httpsModule.createServer(
+  {
+    key: fs.readFileSync("./certs/rc.key"),
+    cert: fs.readFileSync("./certs/rc.cert")
+  },
+  httpHandler
+);
+
 // import { thisClient as client } from "./index.html";
 
 //-----------------------------------------------------------------------------
 //Variables
 //-----------------------------------------------------------------------------
-const options = {
-  key: fs.readFileSync("./certs/rc.key"),
-  cert: fs.readFileSync("./certs/rc.cert")
-};
 
 let clients = {
   current: {
