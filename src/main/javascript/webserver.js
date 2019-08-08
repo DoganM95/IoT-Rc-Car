@@ -21,8 +21,11 @@ let pigpio = pigpioModule.Gpio;
 
 let https = httpsModule.createServer(
   {
-    key: fs.readFileSync(__dirname + "/certs/cert.pem"),
-    cert: fs.readFileSync(__dirname + "/certs/key.pem")
+    //Generate the needed keys:
+    //openssl req -nodes -new -x509 -keyout server.key -out server.cert
+    //Can skip all except COMMON NAME and EMAIL
+    key: fs.readFileSync(__dirname + "/certs/server.cert"),
+    cert: fs.readFileSync(__dirname + "/certs/server.key")
   },
   httpHandler
 );
