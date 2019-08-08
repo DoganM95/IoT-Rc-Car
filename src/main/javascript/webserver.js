@@ -7,10 +7,10 @@
 //ssh pi@pi-rc.ddns.net -p 28342
 
 // NPM Modules
-let https = require("http").createServer(httpHandler); //require http server, and create server with function handler()
+let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
 let https = require("https").createServer(httpHandler); //NEEDS FIX
 let fs = require("fs"); //require filesystem module
-let io = require("socket.io")(https); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
+let io = require("socket.io")(http); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
 let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
 let pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //include pigpio to enable pulse width modulation for servo
 let three = require("three"); //https://www.npmjs.com/package/three //
