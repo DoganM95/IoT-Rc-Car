@@ -19,6 +19,7 @@ let three = require("three"); //https://www.npmjs.com/package/three //
 pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
 let pigpio = pigpioModule.Gpio;
 
+console.log("dirname: " + __dirname);
 let https = httpsModule.createServer(
   {
     //Generate the needed keys:
