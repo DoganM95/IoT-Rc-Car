@@ -183,13 +183,13 @@ io.sockets.on("connection", function(socket) {
 
     socket.on("engineSocket", gamma => {
       console.log("speed-angle: " + gamma.angle);
-      clients.current.sensors.deviceorientation.gamma = gamma.angle;
+      clients.current.state.deviceorientation.gamma = gamma.angle;
       try {
-        if (clients.current.sensors.deviceorientation.gamma < -5) {
+        if (clients.current.state.deviceorientation.gamma < -5) {
           car.engine.bothMotors.setBackward();
-          if (clients.current.sensors.deviceorientation.gamma < clients.current.settings.axisLimits.bottom) {
+          if (clients.current.state.deviceorientation.gamma < clients.current.settings.axisLimits.bottom) {
             console.log(
-              "clients.current.sensors.deviceorientation.gamma < " +
+              "clients.current.state.deviceorientation.gamma < " +
                 clients.current.settings.axisLimits.left +
                 ", speeding out"
             );
@@ -199,25 +199,25 @@ io.sockets.on("connection", function(socket) {
               "setting speed to " +
                 (car.engine.avgMotor.getPwmRange() /
                   (clients.current.settings.axisLimits.bottom - clients.current.settings.axisLimits.deadzone.bottom)) *
-                  clients.current.sensors.deviceorientation.gamma
+                  clients.current.state.deviceorientation.gamma
             );
             car.engine.bothMotors.setSpeed(
               Math.round(
                 (car.engine.avgMotor.getPwmRange() / clients.current.settings.axisLimits.bottom) *
-                  clients.current.sensors.deviceorientation.gamma
+                  clients.current.state.deviceorientation.gamma
               )
             );
           }
-        } else if (clients.current.sensors.deviceorientation.gamma > 5) {
+        } else if (clients.current.state.deviceorientation.gamma > 5) {
           car.engine.bothMotors.setForward();
-          if (clients.current.sensors.deviceorientation.gamma > clients.current.settings.axisLimits.top) {
+          if (clients.current.state.deviceorientation.gamma > clients.current.settings.axisLimits.top) {
             car.engine.bothMotors.setSpeed(car.engine.avgMotor.getPwmRange());
           } else {
             car.engine.bothMotors.setSpeed(
               Math.round(
                 (car.engine.avgMotor.getPwmRange() /
                   (clients.current.settings.axisLimits.top - clients.current.settings.axisLimits.deadzone.top)) *
-                  clients.current.sensors.deviceorientation.gamma
+                  clients.current.state.deviceorientation.gamma
               )
             );
           }
