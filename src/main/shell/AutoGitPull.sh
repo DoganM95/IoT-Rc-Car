@@ -2,13 +2,13 @@
 
 # Define a timestamp function
 timestamp() {
-  date +"%T"
+    date +"%T"
 }
 NPMRUN="shellstart"
-
+grepper=""
 
 #start RC-Car Server initially on boot
-echo $(timestamp) >> /home/pi/Desktop/ran.txt
+echo $(timestamp) >>/home/pi/Desktop/ran.txt
 cd /home/pi/project/RaspberryPi_RC-Car/
 sudo killall node
 git fetch
@@ -25,9 +25,6 @@ zenity --info --text "Startet Server" &
 #nohup /home/pi/project/RaspberryPi_RC-Car/src/main/shell/AutoGitPull.sh &
 #sudo nohup /home/pi/Project/RaspberryPi_RC-Car/src/main/shell/AutoGitPull.sh >$
 
-
-
-
 cd /home/pi/project/RaspberryPi_RC-Car/
 while :; do
     git fetch
@@ -35,24 +32,30 @@ while :; do
     LOCAL=$(git rev-parse @)
     REMOTE=$(git rev-parse "$UPSTREAM")
     BASE=$(git merge-base @ "$UPSTREAM")
+    grepper=$(ps aux | grep '.*node.*.js' | grep -v '.*grep.*')
+    if [ -z "$grepper" ]; then
+        echo "webserver stopped"
+    else
+        echo "webserver running!"
+    fi
 
     if [ $LOCAL = $REMOTE ]; then
         echo $(timestamp) "Up-to-date"
     elif [ $LOCAL = $BASE ]; then
         echo $(timestamp) "Pulling changes from remote.."
-	sudo killall node
-	git pull
-	# sudo npm run $NPMRUN &
-    sudo npm start &
+        sudo killall node
+        git pull
+        # sudo npm run $NPMRUN &
+        sudo npm start &
     elif [ $REMOTE = $BASE ]; then
         echo $(timestamp) "Pushing local changes to remote.."
-	git pull
-	git add .
-	git commit -m "Automatic push of changes"
-	git push
-else
+        git pull
+        git add .
+        git commit -m "Automatic push of changes"
+        git push
+    else
         echo $(timestamp) "Diverged"
     fi
     sleep 1
-    echo 
+    echo
 done
