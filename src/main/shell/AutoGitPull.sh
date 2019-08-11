@@ -8,7 +8,7 @@ NPMRUN="shellstart"
 grepper=""
 
 #start RC-Car Server initially on boot
-echo $(timestamp) >>/home/pi/Desktop/ran.txt
+# echo $(timestamp) >>/home/pi/Desktop/ran.txt
 cd /home/pi/project/RaspberryPi_RC-Car/
 sudo killall node
 git fetch
@@ -16,8 +16,8 @@ git checkout dev
 git pull
 #sudo npm start &
 # sudo npm run $NPMRUN &
-sudo npm start &
-zenity --info --text "Startet Server" &
+# sudo npm start &
+# zenity --info --text "Startet Server" &
 #xterm -e 'bash -c "echo server is up;sleep 10"' &>/dev/null &
 
 #Then start a script to poll and pull on changes and restart server afterwards
@@ -39,7 +39,7 @@ while :; do
         sudo killall node
         git pull
         # sudo npm run $NPMRUN &
-        sudo npm start &
+        # sudo npm start &
     elif [ $REMOTE = $BASE ]; then
         echo $(timestamp) "Pushing local changes to remote.."
         git pull
@@ -49,10 +49,12 @@ while :; do
     else
         echo $(timestamp) "Diverged"
     fi
+
     grepper=$(ps aux | grep '.*node.*.js' | grep -v '.*grep.*')
     if [ -z "$grepper" ]; then
         echo "webserver stopped, restarting..."
         sudo npm start &
+        sleep 10 #give node time to start
     fi
     sleep 1
     echo
