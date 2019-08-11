@@ -32,13 +32,6 @@ while :; do
     LOCAL=$(git rev-parse @)
     REMOTE=$(git rev-parse "$UPSTREAM")
     BASE=$(git merge-base @ "$UPSTREAM")
-    grepper=$(ps aux | grep '.*node.*.js' | grep -v '.*grep.*')
-    if [ -z "$grepper" ]; then
-        echo "webserver stopped"
-    else
-        echo "webserver running!"
-    fi
-
     if [ $LOCAL = $REMOTE ]; then
         echo $(timestamp) "Up-to-date"
     elif [ $LOCAL = $BASE ]; then
@@ -55,6 +48,11 @@ while :; do
         git push
     else
         echo $(timestamp) "Diverged"
+    fi
+    grepper=$(ps aux | grep '.*node.*.js' | grep -v '.*grep.*')
+    if [ -z "$grepper" ]; then
+        echo "webserver stopped, restarting..."
+        sudo npm start &
     fi
     sleep 1
     echo
