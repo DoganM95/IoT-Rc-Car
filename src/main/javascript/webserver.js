@@ -10,7 +10,7 @@
 let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
 let httpsModule = require("https"); //NEEDS FIX
 let fs = require("fs"); //require filesystem module
-let io = require("socket.io")(https); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
+let ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
 let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
 let pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //include pigpio to enable pulse width modulation for servo
 let three = require("three"); //https://www.npmjs.com/package/three //
@@ -33,6 +33,7 @@ let https = httpsModule.createServer(
   },
   httpHandler
 );
+let io = ioModule(https);
 
 // import { thisClient as client } from "./index.html";
 
