@@ -7,13 +7,13 @@
 //ssh pi@pi-rc.ddns.net -p 28342
 
 // NPM Modules
-let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
+// let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
 let httpsModule = require("https"); //NEEDS FIX
 let fs = require("fs"); //require filesystem module
 let ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
-let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
+// let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
 let pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //include pigpio to enable pulse width modulation for servo
-let three = require("three"); //https://www.npmjs.com/package/three //
+// let three = require("three"); //https://www.npmjs.com/package/three //
 
 // Module configs
 pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
@@ -43,8 +43,8 @@ let io = ioModule(https);
 
 let clients = {
   current: {
-    identity: new Object(),
-    settings: new Object(),
+    identity: undefined,
+    settings: undefined,
     state: {
       sensors: {
         deviceorientation: {
@@ -56,7 +56,7 @@ let clients = {
     }
   },
   predecessor: {
-    identity: new Object()
+    identity: undefined
   },
   list: []
 };
