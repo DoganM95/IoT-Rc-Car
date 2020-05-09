@@ -1,8 +1,8 @@
 {
-  "name": "raspberrypi_rc-car",
-  "version": "1.0.0",
-  "description": "## Ports used:",
-  "main": "server.js",
+  "author": "Dogan",
+  "bugs": {
+    "url": "https://github.com/DoganM95/IoT-RC_Car-Universal.git/issues"
+  },
   "dependencies": {
     "chalk": "2.4.2",
     "commander": "2.20.0",
@@ -12,19 +12,19 @@
     "socket.io": "^2.3.0",
     "three": "^0.107.0"
   },
+  "description": "",
   "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "sudo node /home/pi/project/Software/src/main/javascript/webserver.js"
-  },
+  "homepage": "https://github.com/DoganM95/IoT-RC_Car-Universal.git#readme",
+  "license": "ISC",
+  "main": "server.js",
+  "name": "rc-car",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DoganM95/RaspberryPi_RC-Car.git"
+    "url": "git+https://github.com/DoganM95/IoT-RC_Car-Universal.git"
   },
-  "author": "Dogan",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/DoganM95/RaspberryPi_RC-Car/issues"
+  "scripts": {
+    "start": "sudo node /home/pi/project/Software/src/main/javascript/webserver.js &",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://github.com/DoganM95/RaspberryPi_RC-Car#readme"
+  "version": "1.0.0"
 }
