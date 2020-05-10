@@ -24,4 +24,4 @@ sudo ssh-keygen -t rsa -b 4096 -C "youremail@yourdomain.com"
 8. Register the keys in github:
 cat /home/pi/.ssh/id_rsa.pub -> this will print your public key for user pi, copy and navigate to 
 https://github.com/settings/keys -> "New SSh Key" Button, then paste (without email-part) and save.
-cat /root/.ssh/id_rsa.pub -> this will print your public key for user root, copy again, paste in new github key and save.
+sudo cat /root/.ssh/id_rsa.pub -> this will print your public key for user root, copy again, paste in new github key and save.
