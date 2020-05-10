@@ -39,11 +39,15 @@ while true; do
         echo $currentTime " - Pulling changes from remote.."
         sudo killall node && echo "killed any running node process"
         git pull
+        chown -R pi $projectPath
+        chmod -R +rwx $projectPath
         # sudo npm start &
 
     elif [ $REMOTE = $BASE ]; then
         echo $currentTime " - Local project folder has changes to push. "
         git pull
+        chown -R pi $projectPath
+        chmod -R +rwx $projectPath
         # echo $(Timestamp) "Pushing local changes to remote.."
         # git add $projectPath
         # git commit -m "Automatic push of changes from embedded device"
