@@ -57,13 +57,14 @@ while true; do
     # git clone git@github.com:DoganM95/IoT-RC_Car-Universal.git $projectPath && break
     sleep 1
 done
+git config credential.helper store # save git credentials
 
 # Setting permissions
 echo "\e[30;48;5;82mSetting permissions and env variables... \e[0m"
 chown -R pi $projectPath
 chmod -R +rwx $projectPath
 
-# switch to working branch
+# switch to working branch (gives a nice output)
 echo "Switching to working branch"
 git checkout $workingBranch
 
