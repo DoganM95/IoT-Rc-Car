@@ -23,7 +23,7 @@
     "url": "git+https://github.com/DoganM95/IoT-RC_Car-Universal.git"
   },
   "scripts": {
-    "start": "sudo node /home/pi/project/Software/src/main/javascript/webserver.js &",
+    "start": "sudo node /home/pi/project/Raspberry>Pi/Software/src/main/javascript/webserver.js &",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "version": "1.0.0"
