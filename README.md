@@ -16,6 +16,9 @@ where NetworkName is the destination SSID and NetworkPassword is the SSID's pass
 4. Put the SD card into the Pi and boot it up
 5. Find the local IP-Address of the Pi (different tools available, e.g. "arp-scan" in Windows-CMD, or "Fing" app in Android)
 6. Connect to the Pi using ssh. ssh pi@192.168.0.10 (replace with your Pi's IP), password is raspberry
+7. Configure Pi:
+sudo raspi-config
+Change password and other optional settings and re-login via ssh
 7. Create an SSH key for each account (pi and root):
 ssh-keygen -t rsa -b 4096 -C "youremail@yourdomain.com"
 -> SSH key for account Pi is now created
@@ -25,3 +28,14 @@ sudo ssh-keygen -t rsa -b 4096 -C "youremail@yourdomain.com"
 cat /home/pi/.ssh/id_rsa.pub -> this will print your public key for user pi, copy and navigate to 
 https://github.com/settings/keys -> "New SSh Key" Button, then paste (without email-part) and save.
 sudo cat /root/.ssh/id_rsa.pub -> this will print your public key for user root, copy again, paste in new github key and save.
+9. install git:
+sudo apt update && sudo apt install git && git --version
+9. Clone repository via SSH:
+Go to Repository's web interface, click clone, copy the ssh-cloning link and 
+git clone <Repo-link>
+10. Add permissions:
+sudo chmod -R +rwx IoT-RC_Car-Universal
+11. Run initializer script (Needs user interaction for github credentials)
+sudo /home/pi/IoT-RC_Car-Universal/RaspberryPi/Software/src/main/shell/init.sh
+12. Remove old Folder:
+ sudo rm -r /home/pi/IoT-RC_Car-Universal
