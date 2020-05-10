@@ -38,6 +38,7 @@ while true; do
     elif [ $LOCAL = $BASE ]; then
         echo $currentTime " - Pulling changes from remote.."
         sudo killall node && echo "killed any running node process"
+        git reset --hard origin/$workingBranch
         git pull
         chown -R pi $projectPath
         chmod -R +rwx $projectPath
@@ -45,6 +46,7 @@ while true; do
 
     elif [ $REMOTE = $BASE ]; then
         echo $currentTime " - Local project folder has changes to push. "
+        git reset --hard origin/$workingBranch
         git pull
         chown -R pi $projectPath
         chmod -R +rwx $projectPath
