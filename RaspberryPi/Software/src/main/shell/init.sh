@@ -68,6 +68,10 @@ chmod -R +rwx $projectPath
 echo "Switching to working branch"
 git checkout $workingBranch
 
+# install node modules
+echo "Installing npm packages"
+sudo npm install --prefix $softwarePath
+
 # Create environmental variable as shortcut
 export projectRoot=$softwarePath
 set | grep "projectRoot"
