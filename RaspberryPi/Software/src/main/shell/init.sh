@@ -10,7 +10,7 @@ rm -r $tempNodeDir # delete any existing node temp dir
 rm -r $projectPath # delete any existing node temp dir
 
 # update existing apt packages
-apt update && apt upgrade
+apt update && apt -y upgrade
 
 # --------------------------------------------------
 # install Git
@@ -43,18 +43,34 @@ rm -r $tempNodeDir && echo "Done."
 # Pull project files from remote repository
 # --------------------------------------------------
 echo "\e[30;48;5;82mPulling files from remote repository... \e[0m"
-echo "Creating folder $projectPath ..."
-mkdir $projectPath && echo "Done." # creates folder of projectPath
+echo "Deleting previous project directory..."
+rm -r $projectPath
+echo "Done."
+
+mkdir $projectPath
 cd $projectPath
+
 echo "Cloning $projectRepository into local folder $projectPath ..."
 git config credential.helper store # save git credentials
 while true; do
-    git clone $projectRepository $projectPath && break
+    git clone --branch $workingBranch $projectRepository $projectPath && break
+    # git clone git@github.com:DoganM95/IoT-RC_Car-Universal.git $projectPath && break
     sleep 1
 done
 
 # Setting permissions
+echo "\e[30;48;5;82mSetting permissions and env variables... \e[0m"
+chown -R pi $projectPath
 chmod -R +rwx $projectPath
+
+# switch to working branch
+echo "Switching to working branch"
+git checkout $workingBranch
+
+# Create environmental variable as shortcut
+export projectRoot=$softwarePath
+set | grep "projectRoot"
+
 echo "Done."
 
 echo "\e[92mScript finished."
