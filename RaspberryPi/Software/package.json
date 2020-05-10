@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "sudo node /home/pi/project/Raspberry>Pi/Software/src/main/javascript/webserver.js &",
-    "serve": "sudo /home/pi/project/Raspberry>Pi/Software/src/main/shell/service.sh",
+    "serve": "sudo /home/pi/project/RaspberryPi/Software/src/main/shell/service.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "version": "1.0.0"
