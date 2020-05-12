@@ -40,6 +40,16 @@ echo "Deleting temporary folder $tempNodeDir ..."
 rm -r $tempNodeDir && echo "Done."
 
 # --------------------------------------------------
+# Install pigpio && node-gyp
+# --------------------------------------------------
+echo "\e[30;48;5;82mInstalling pigpio requirements... \e[0m"
+echo "Installing required packages for pigpio"
+echo "Installing node-gyp..."
+sudo apt install node-gyp && echo "Done."
+echo "Installing pigpio..."
+sudo apt install pigpio && echo "Done."
+
+# --------------------------------------------------
 # Pull project files from remote repository
 # --------------------------------------------------
 echo "\e[30;48;5;82mPulling files from remote repository... \e[0m"
