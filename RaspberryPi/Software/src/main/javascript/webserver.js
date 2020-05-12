@@ -19,20 +19,20 @@ let pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#ser
 pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
 let pigpio = pigpioModule.Gpio;
 
-console.log("dirname: " + __dirname);
-let https = httpsModule.createServer(
-  {
-    //Generate the needed keys:
-    //openssl req -nodes -new -x509 -keyout server.key -out server.cert
-    //Can skip all except COMMON NAME and EMAIL
+// console.log("dirname: " + __dirname);
+// let https = httpsModule.createServer(
+//   {
+//     //Generate the needed keys:
+//     //openssl req -nodes -new -x509 -keyout server.key -out server.cert
+//     //Can skip all except COMMON NAME and EMAIL
 
-    //openssl req -newkey rsa:2048 -new -nodes -keyout key.pem -out csr.pem
-    //openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out server.crt
-    key: fs.readFileSync(__dirname + "/certs/server.key", "utf8"),
-    cert: fs.readFileSync(__dirname + "/certs/server.crt", "utf8"),
-  },
-  httpHandler
-);
+//     //openssl req -newkey rsa:2048 -new -nodes -keyout key.pem -out csr.pem
+//     //openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out server.crt
+//     key: fs.readFileSync(__dirname + "/certs/server.key", "utf8"),
+//     cert: fs.readFileSync(__dirname + "/certs/server.crt", "utf8"),
+//   },
+//   httpHandler
+// );
 let io = ioModule(http);
 
 // import { thisClient as client } from "./index.html";
