@@ -37,7 +37,7 @@ while true; do
 
     elif [ $LOCAL = $BASE ]; then
         echo $currentTime " - Pulling changes from remote.."
-        sudo killall node && echo "killed any running node process"
+        killall node && echo "killed any running node process"
         git reset --hard origin/$workingBranch
         git pull
         chown -R pi $projectPath
@@ -61,7 +61,7 @@ while true; do
 
     if [ -z "$(ps aux | grep '.*node.*.js' | grep -v '.*grep.*')" ]; then
         echo "webserver stopped, restarting..."
-        sudo npm start
+        npm start
         echo "Webserver startet."
     fi
     sleep $sleepDurationBetweenGitFetches
