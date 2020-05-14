@@ -112,7 +112,7 @@ let car = {
         this.speed.pwmWrite(Math.abs(Math.round(speed)));
       },
     },
-    hMotors: {
+    Motors: {
       setForward: function () {
         car.engine.rightMotor.forward.digitalWrite(1);
         car.engine.leftMotor.forward.digitalWrite(1);
