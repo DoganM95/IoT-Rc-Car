@@ -1,23 +1,12 @@
-//Connection:
-//
-//Internal:
-//ssh pi@192.168.0.169 -p 7633
-//
-//External
-//ssh pi@pi-rc.ddns.net -p 28342
-
-// NPM Modules
-let http = require("http").createServer(httpHandler); //require http server, and create server with function handler()
-// let httpsModule = require("https"); //NEEDS FIX
-let fs = require("fs"); //require filesystem module
-let ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //require socket.io module and pass the http object (server)
-// let gpio = require("onoff").Gpio; //https://www.npmjs.com/package/onoff#class-gpio //include onoff to interact with the GPIO
-let pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //include pigpio to enable pulse width modulation for servo
-// let three = require("three"); //https://www.npmjs.com/package/three //
+let http = require("http").createServer(httpHandler);
+// let httpsModule = require("https"); //TODO
+let fs = require("fs"); //filesystem module
+let ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //socket.io module and pass the http object (server)
+let pigpio = require("pigpio").Gpio; //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
+// let three = require("three"); //https://www.npmjs.com/package/three
 
 // Module configs
 pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
-let pigpio = pigpioModule.Gpio;
 
 // console.log("dirname: " + __dirname);
 // let https = httpsModule.createServer(
@@ -38,27 +27,28 @@ let io = ioModule(http);
 // import { thisClient as client } from "./index.html";
 
 //-----------------------------------------------------------------------------
-//Variables
+// Variables
 //-----------------------------------------------------------------------------
 
-let clients = {
-  current: {
-    identity: undefined,
-    settings: undefined,
-    state: {
-      sensors: {
-        deviceorientation: {
-          alpha: 0,
-          beta: 0,
-          gamma: 0,
-        },
+let client = {
+  identity: undefined,
+  settings: {
+    engine: {},
+    steering: {
+      leftServoOffset: 0,
+      rightServoOffset: 0,
+    },
+  },
+  state: {
+    sensors: {
+      deviceorientation: {
+        exists: undefined,
+        alpha: 0,
+        beta: 0,
+        gamma: 0,
       },
     },
   },
-  predecessor: {
-    identity: undefined,
-  },
-  list: [],
 };
 
 let car = {
@@ -66,7 +56,7 @@ let car = {
     leftServo: new pigpio(23, { mode: pigpio.OUTPUT }),
     rightServo: new pigpio(24, { mode: pigpio.OUTPUT }),
     setDirection: function (angle) {
-      //Syncing algorithm comes here
+      //Syncing algorithm goes here
       this.leftServo.servoWrite(angle);
       this.rightServo.servoWrite(angle);
     },
@@ -116,7 +106,7 @@ let car = {
         this.speed.pwmWrite(Math.abs(Math.round(speed)));
       },
     },
-    bothMotors: {
+    hMotors: {
       setForward: function () {
         car.engine.rightMotor.forward.digitalWrite(1);
         car.engine.leftMotor.forward.digitalWrite(1);
@@ -137,8 +127,6 @@ let car = {
         car.engine.leftMotor.speed.pwmFrequency(hertz);
         car.engine.rightMotor.speed.pwmFrequency(hertz);
       },
-    },
-    avgMotor: {
       getSpeed: function () {
         return (car.engine.leftMotor.speed.getPwmDutyCycle() + car.engine.rightMotor.speed.getPwmDutyCycle()) / 2;
       },
@@ -162,7 +150,7 @@ let car = {
 //-----------------------------------------------------------------------------
 //Main
 //-----------------------------------------------------------------------------
-car.engine.bothMotors.setPwmFrequency(20000);
+car.engine.Motors.setPwmFrequency(20000);
 console.log("pwm range of left car.engine: " + car.engine.leftMotor.speed.getPwmRange());
 console.log("pwm range of right car.engine: " + car.engine.rightMotor.speed.getPwmRange());
 console.log("pwm freq of left car.engine: " + car.engine.leftMotor.speed.getPwmFrequency());
@@ -170,30 +158,24 @@ console.log("pwm freq of right car.engine: " + car.engine.rightMotor.speed.getPw
 
 //Server Socket listener
 io.sockets.on("connection", function (socket) {
-  try {
-    clients.predecessor.identity.conn.removeAllListeners();
-    console.log("Disconnected: " + clients.predecessor.identity.conn.remoteAddress);
-  } catch (e) {
-    console.log("no client to pop!");
-  }
-  clients.predecessor.identity = clients.list[clients.list.length - 1];
-  clients.current.identity = socket.client;
-  clients.list.push(socket.client);
-  console.log("Connected: " + clients.current.identity.conn.remoteAddress + " - " + new Date().toUTCString());
+  //Prologue
+  client.identity = socket.client;
+  console.log("Connected: " + client.identity.conn.remoteAddress + " - " + new Date().toUTCString());
 
+  //Listeners
   socket.on("axisLimits", (data) => {
     console.log("data rec: " + data);
     try {
-      clients.current.settings.axisLimits = data;
+      client.settings.axisLimits = data;
       console.log(
         "received axis limits: top = " +
-          clients.current.settings.axisLimits.top +
+          client.settings.axisLimits.top +
           ", bottom = " +
-          clients.current.settings.axisLimits.bottom +
+          client.settings.axisLimits.bottom +
           ", left = " +
-          clients.current.settings.axisLimits.left +
+          client.settings.axisLimits.left +
           ", right = " +
-          clients.current.settings.axisLimits.right
+          client.settings.axisLimits.right
       );
     } catch (e) {
       console.log(e);
@@ -201,31 +183,27 @@ io.sockets.on("connection", function (socket) {
 
     socket.on("engineSocket", (gamma) => {
       console.log("speed-angle: " + gamma.angle);
-      clients.current.state.sensors.deviceorientation.gamma = gamma.angle;
+      client.state.sensors.deviceorientation.gamma = gamma.angle;
       try {
-        if (clients.current.state.sensors.deviceorientation.gamma < -5) {
+        if (client.state.sensors.deviceorientation.gamma < -5) {
           car.engine.bothMotors.setBackward();
-          if (clients.current.state.sensors.deviceorientation.gamma < clients.current.settings.axisLimits.bottom) {
-            console.log("clients.current.state.sensors.deviceorientation.gamma < " + clients.current.settings.axisLimits.left + ", speeding out");
+          if (client.state.sensors.deviceorientation.gamma < client.settings.axisLimits.bottom) {
+            console.log("client.state.sensors.deviceorientation.gamma < " + client.settings.axisLimits.left + ", speeding out");
             car.engine.bothMotors.setSpeed(car.engine.avgMotor.getPwmRange());
           } else {
             console.log(
               "setting speed to " +
-                (car.engine.avgMotor.getPwmRange() / (clients.current.settings.axisLimits.bottom - clients.current.settings.axisLimits.deadzone.bottom)) *
-                  clients.current.state.sensors.deviceorientation.gamma
+                (car.engine.avgMotor.getPwmRange() / (client.settings.axisLimits.bottom - client.settings.axisLimits.deadzone.bottom)) * client.state.sensors.deviceorientation.gamma
             );
-            car.engine.bothMotors.setSpeed(Math.round((car.engine.avgMotor.getPwmRange() / clients.current.settings.axisLimits.bottom) * clients.current.state.sensors.deviceorientation.gamma));
+            car.engine.bothMotors.setSpeed(Math.round((car.engine.avgMotor.getPwmRange() / client.settings.axisLimits.bottom) * client.state.sensors.deviceorientation.gamma));
           }
-        } else if (clients.current.state.sensors.deviceorientation.gamma > 5) {
+        } else if (client.state.sensors.deviceorientation.gamma > 5) {
           car.engine.bothMotors.setForward();
-          if (clients.current.state.sensors.deviceorientation.gamma > clients.current.settings.axisLimits.top) {
+          if (client.state.sensors.deviceorientation.gamma > client.settings.axisLimits.top) {
             car.engine.bothMotors.setSpeed(car.engine.avgMotor.getPwmRange());
           } else {
             car.engine.bothMotors.setSpeed(
-              Math.round(
-                (car.engine.avgMotor.getPwmRange() / (clients.current.settings.axisLimits.top - clients.current.settings.axisLimits.deadzone.top)) *
-                  clients.current.state.sensors.deviceorientation.gamma
-              )
+              Math.round((car.engine.avgMotor.getPwmRange() / (client.settings.axisLimits.top - client.settings.axisLimits.deadzone.top)) * client.state.sensors.deviceorientation.gamma)
             );
           }
         } else {
