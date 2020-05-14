@@ -192,28 +192,28 @@ io.sockets.on("connection", function (socket) {
       client.state.sensors.deviceorientation.gamma = gamma.angle;
       try {
         if (client.state.sensors.deviceorientation.gamma < -5) {
-          car.engine.bothMotors.setBackward();
+          car.engine.Motors.setBackward();
           if (client.state.sensors.deviceorientation.gamma < client.settings.axisLimits.bottom) {
             console.log("client.state.sensors.deviceorientation.gamma < " + client.settings.axisLimits.left + ", speeding out");
-            car.engine.bothMotors.setSpeed(car.engine.avgMotor.getPwmRange());
+            car.engine.Motors.setSpeed(car.engine.avgMotor.getPwmRange());
           } else {
             console.log(
               "setting speed to " +
                 (car.engine.avgMotor.getPwmRange() / (client.settings.axisLimits.bottom - client.settings.axisLimits.deadzone.bottom)) * client.state.sensors.deviceorientation.gamma
             );
-            car.engine.bothMotors.setSpeed(Math.round((car.engine.avgMotor.getPwmRange() / client.settings.axisLimits.bottom) * client.state.sensors.deviceorientation.gamma));
+            car.engine.Motors.setSpeed(Math.round((car.engine.avgMotor.getPwmRange() / client.settings.axisLimits.bottom) * client.state.sensors.deviceorientation.gamma));
           }
         } else if (client.state.sensors.deviceorientation.gamma > 5) {
-          car.engine.bothMotors.setForward();
+          car.engine.Motors.setForward();
           if (client.state.sensors.deviceorientation.gamma > client.settings.axisLimits.top) {
-            car.engine.bothMotors.setSpeed(car.engine.avgMotor.getPwmRange());
+            car.engine.Motors.setSpeed(car.engine.avgMotor.getPwmRange());
           } else {
-            car.engine.bothMotors.setSpeed(
+            car.engine.Motors.setSpeed(
               Math.round((car.engine.avgMotor.getPwmRange() / (client.settings.axisLimits.top - client.settings.axisLimits.deadzone.top)) * client.state.sensors.deviceorientation.gamma)
             );
           }
         } else {
-          car.engine.bothMotors.setSpeed(0);
+          car.engine.Motors.setSpeed(0);
         }
       } catch (e) {
         console.log(e);
@@ -235,7 +235,7 @@ console.log("waiting for connection on web-interface.");
 process.on("SIGINT", function () {
   //on ctrl+c
   console.log("killing server.");
-  car.engine.bothMotors.setSpeed(0);
+  car.engine.Motors.setSpeed(0);
   car.steering.setDirection(1500);
   process.exit(); //exit completely
 });
