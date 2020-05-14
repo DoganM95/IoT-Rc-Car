@@ -1,13 +1,18 @@
-let http = require("http").createServer(httpHandler);
+const http = require("http").createServer(httpHandler);
 // let httpsModule = require("https"); //TODO
-let fs = require("fs"); //filesystem module
-let ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //socket.io module and pass the http object (server)
-let pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
+const fs = require("fs"); //filesystem module
+const ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //socket.io module and pass the http object (server)
+const pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
 // let three = require("three"); //https://www.npmjs.com/package/three
 
-let pigpio = pigpioModule.Gpio;
 // Module configs
-pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
+try {
+  pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
+} catch (e) {
+  console.log(e);
+}
+
+const pigpio = pigpioModule.Gpio;
 
 // console.log("dirname: " + __dirname);
 // let https = httpsModule.createServer(
