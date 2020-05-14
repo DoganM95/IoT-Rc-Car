@@ -183,11 +183,11 @@
           //       -55            gamma
 
           roundAxisValue("speed", event.gamma, 50);
-          roundAxisValue("steering", event.beta, 50);
+          roundAxisValue("steering", event.beta ? event.beta : event.y * 90, 50);
 
           //Manipulate DOM to show values on html page
           gamma.innerHTML = "Gamma: " + event.gamma;
-          beta.innerHTML = "Beta: " + event.beta;
+          beta.innerHTML = "Beta: " + event.beta ? event.beta : event.y * 90;;
           alpha.innerHTML = "Alpha: " + event.alpha;
           absolute.innerHTML = "Absolute: " + event.absolute;
           console.log(event.gamma);
