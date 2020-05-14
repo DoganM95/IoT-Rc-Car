@@ -6,7 +6,7 @@ let pigpio = require("pigpio").Gpio; //https://www.npmjs.com/package/pigpio#serv
 // let three = require("three"); //https://www.npmjs.com/package/three
 
 // Module configs
-pigpio.configureClock(2, pigpioModule.CLOCK_PCM);
+pigpio.configureClock(2, pigpio.CLOCK_PCM);
 
 // console.log("dirname: " + __dirname);
 // let https = httpsModule.createServer(
