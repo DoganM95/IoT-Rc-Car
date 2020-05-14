@@ -99,11 +99,6 @@
     //---------------------------------------------------------------------
 
     window.addEventListener("load", function () {
-      if (typeof Gyroscope === "function") {
-        document.getElementById("alpha").innerText = "true"
-      } else {
-        document.getElementById("alpha").innerText = "false"
-      }
       const alpha = document.getElementById("alpha");
       const beta = document.getElementById("beta");
       const gamma = document.getElementById("gamma");
@@ -195,6 +190,7 @@
           beta.innerHTML = "Beta: " + event.beta;
           alpha.innerHTML = "Alpha: " + event.alpha;
           absolute.innerHTML = "Absolute: " + event.absolute;
+          console.log(event.gamma);
         },
         true
       );
