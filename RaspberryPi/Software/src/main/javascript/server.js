@@ -1,5 +1,5 @@
 // const http = require("http").createServer(httpHandler);
-let https = require("https");
+let httpsModule = require("https");
 const fs = require("fs"); //filesystem module
 const ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //socket.io module and pass the http object (server)
 const pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
