@@ -175,25 +175,31 @@
         }
       });
 
+
+      function handleOrientationEvent(event) {
+        var x = event.beta ? event.beta : event.y * 90;
+        var y = event.gamma ? event.gamma : event.x * 90;
+
+        window.console && console.info('Raw position: x, y: ', x, y);
+
+
+        //        55            gamma
+        // -30    +-5    30     betas  //gamma dead zone = 5 (the zone where nothing happens) for speed only, as unwanted steering is not critical
+        //       -55            gamma
+
+        roundAxisValue("speed", event.gamma, 50);
+        roundAxisValue("steering", event.beta ? event.beta : event.y * 90, 50);
+
+        //Manipulate DOM to show values on html page
+        gamma.innerHTML = "Gamma: " + event.gamma;
+        beta.innerHTML = "Beta: " + event.beta ? event.beta : event.y * 90;;
+        alpha.innerHTML = "Alpha: " + event.alpha;
+        absolute.innerHTML = "Absolute: " + event.absolute;
+        console.log(event);
+      }
+
       window.addEventListener(
-        "deviceorientation",
-        event => {
-          //        55            gamma
-          // -30    +-5    30     betas  //gamma dead zone = 5 (the zone where nothing happens) for speed only, as unwanted steering is not critical
-          //       -55            gamma
-
-          roundAxisValue("speed", event.gamma, 50);
-          roundAxisValue("steering", event.beta ? event.beta : event.y * 90, 50);
-
-          //Manipulate DOM to show values on html page
-          gamma.innerHTML = "Gamma: " + event.gamma;
-          beta.innerHTML = "Beta: " + event.beta ? event.beta : event.y * 90;;
-          alpha.innerHTML = "Alpha: " + event.alpha;
-          absolute.innerHTML = "Absolute: " + event.absolute;
-          console.log(event);
-        },
-        true
-      );
+        "deviceorientation", handleOrientationEvent, true);
     });
 
     //---------------------------------------------------------------------
