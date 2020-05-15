@@ -14,8 +14,6 @@ try {
 
 const pigpio = pigpioModule.Gpio;
 
-console.log("dirname: " + __dirname);
-
 https.createServer(
   {
     key: fs.readFileSync(__dirname + "/certs/cert.pem"),
