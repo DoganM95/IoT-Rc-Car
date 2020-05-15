@@ -16,8 +16,8 @@ const pigpio = pigpioModule.Gpio;
 
 https.createServer(
   {
-    key: fs.readFileSync(__dirname + "/certs/cert.pem"),
-    cert: fs.readFileSync(__dirname + "/certs/key.pem"),
+    key: fs.readFileSync(__dirname + "/certs/key.pem"),
+    cert: fs.readFileSync(__dirname + "/certs/cert.pem"),
   },
   (req, res) => {
     fs.readFile(__dirname + "/index.html", function (err, data) {
