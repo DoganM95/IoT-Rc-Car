@@ -38,6 +38,7 @@ while true; do
     elif [ $LOCAL = $BASE ]; then
         echo $currentTime " - Pulling changes from remote.."
         killall node && echo "killed any running node process"
+        killall pigpiod && echo "killed pigpio deamon"
         git reset --hard origin/$workingBranch
         git pull
         chown -R pi $projectPath
@@ -46,10 +47,10 @@ while true; do
 
     elif [ $REMOTE = $BASE ]; then
         echo $currentTime " - Local project folder has changes to push. "
-        git reset --hard origin/$workingBranch
+        git reset --hard origin/$workingBranch # revert changes to be able to pull
         git pull
-        chown -R pi $projectPath
-        chmod -R +rwx $projectPath
+        # chown -R pi $projectPath
+        # chmod -R +rwx $projectPath
         # echo $(Timestamp) "Pushing local changes to remote.."
         # git add $projectPath
         # git commit -m "Automatic push of changes from embedded device"
