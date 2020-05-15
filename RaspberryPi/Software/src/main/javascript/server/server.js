@@ -20,7 +20,7 @@ let https = httpsModule.createServer(
     cert: fs.readFileSync(__dirname + "/certs/cert.pem"),
   },
   (req, res) => {
-    fs.readFile(__dirname + "/index.html", function (err, data) {
+    fs.readFile(__dirname.replace("/server", "/client") + "/index.html", function (err, data) {
       if (!err) {
         res.writeHead(200, {
           "Content-Type": "text/html",
