@@ -10,18 +10,10 @@
 
 <body>
   <div id="sensors">
-    <h3 id="gamma">Gyroscope accessible:</h3>
-    <p id="gyrodefined"></p>
-    <br />
-    <h3 id="gamma">InitialGamma</h3>
-    <br />
-    <h3 id="beta">InitialBeta</h3>
-    <br />
-    <h3 id="alpha">InitialAlpha</h3>
-    <br />
-    <h3 id="absolute">
-      InitialAbsolute
-    </h3>
+    <h3 id="gamma">Gamma</h3><br />
+    <h3 id="beta">Beta</h3><br />
+    <h3 id="alpha">Alpha</h3><br />
+    <h3 id="absolute">Absolute</h3>
   </div>
   <br /><br />
   <div id="data">
@@ -39,6 +31,13 @@
     <p>Steering Requests per Second:</p>
     <p id="steering-angle"></p>
   </div>
+
+
+  <script type="text/javascript" src="/controls/keypad.js">
+    import keypad from "/controls/keypad.js";
+    document.addEventListener("keydown", keypad.handler);
+  </script>
+
 
   <script>
     //---------------------------------------------------------------------
@@ -94,6 +93,7 @@
         }
       }
     };
+
     //---------------------------------------------------------------------
     // MAIN
     //---------------------------------------------------------------------
@@ -107,9 +107,11 @@
       let servoLeftElement = document.getElementById("servoLeftButton");
       let servoRightElement = document.getElementById("servoRightButton");
 
+      //Socket Emissions
       socket.emit("steeringSocket", thisClient.car.steering.angle.value); //initially center servo
       socket.emit("axisLimits", thisClient.settings.axisLimits);
 
+      //Socket Receives
       socket.on("motorSpeedSocket", data => {
         //when motor-speed changes, receive the speed via socket
         thisClient.car.engine.speed.value =
@@ -128,61 +130,9 @@
         );
       });
 
-      document.addEventListener("keydown", async key => {
-        console.log("Key: " + key.keyCode + " pressed."); //log the pressed key
-        switch (
-          key.keyCode //switch statement for pressed key
-        ) {
-          case 40: //backward
-            if (thisClient.car.engine.speed.value > 0) {
-              socket.emit("motorSocket", thisClient.car.engine.speed.value - thisClient.car.engine.speed
-                .increment);
-            }
-            break;
-          case 38: //forward
-            if (thisClient.car.engine.speed.value < 255) {
-              socket.emit("motorSocket", thisClient.car.engine.speed.value + thisClient.car.engine.speed
-                .increment);
-            }
-            break;
-          case 53: //Full Speed or stop (like play pause)
-            if (thisClient.car.engine.speed.value > 0) {
-              socket.emit("motorSocket", 0); //stops motor, if motor is running
-            }
-            if (thisClient.car.engine.speed.value == 0) {
-              socket.emit("motorSocket", 255); //max-speeds motor, if it was off
-            }
-            break;
-            //Servo direction control
-          case 39: //key right
-            if (thisClient.car.steering.angle.value > 500) {
-              socket.emit(
-                "steeringSocket",
-                thisClient.car.steering.angle.value - thisClient.car.steering.angle.increment
-              );
-              thisClient.car.steering.angle.value -= thisClient.car.steering.angle.increment;
-            }
-            break;
-          case 37: //key left
-            if (thisClient.car.steering.angle.value < 2500) {
-              socket.emit(
-                "steeringSocket",
-                thisClient.car.steering.angle.value + thisClient.car.steering.angle.increment
-              );
-              thisClient.car.steering.angle.value += thisClient.car.steering.angle.increment;
-            }
-            break;
-        }
-      });
 
 
       function handleOrientationEvent(event) {
-        var x = event.beta ? event.beta : event.y * 90;
-        var y = event.gamma ? event.gamma : event.x * 90;
-
-        window.console && console.info('Raw position: x, y: ', x, y);
-
-
         //        55            gamma
         // -30    +-5    30     betas  //gamma dead zone = 5 (the zone where nothing happens) for speed only, as unwanted steering is not critical
         //       -55            gamma
@@ -192,10 +142,9 @@
 
         //Manipulate DOM to show values on html page
         gamma.innerHTML = "Gamma: " + event.gamma;
-        beta.innerHTML = "Beta: " + event.beta ? event.beta : event.y * 90;;
+        beta.innerHTML = "Beta: " + event.beta;
         alpha.innerHTML = "Alpha: " + event.alpha;
         absolute.innerHTML = "Absolute: " + event.absolute;
-        console.log(event);
       }
 
       window.addEventListener(
