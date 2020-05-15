@@ -1,5 +1,5 @@
-const http = require("http").createServer(httpHandler);
-// let httpsModule = require("https"); //TODO
+// const http = require("http").createServer(httpHandler);
+let https = require("https");
 const fs = require("fs"); //filesystem module
 const ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //socket.io module and pass the http object (server)
 const pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
@@ -14,20 +14,32 @@ try {
 
 const pigpio = pigpioModule.Gpio;
 
-// console.log("dirname: " + __dirname);
-// let https = httpsModule.createServer(
-//   {
-//     //Generate the needed keys:
-//     //openssl req -nodes -new -x509 -keyout server.key -out server.cert
-//     //Can skip all except COMMON NAME and EMAIL
+console.log("dirname: " + __dirname);
+let https = httpsModule.createServer(
+  {
+    key: fs.readFileSync("./certs/cert.pem"),
+    cert: fs.readFileSync("./certs/key.pem"),
+  },
+  (req, res) => {
+    fs.readFile(__dirname + "/index.html", function (err, data) {
+      if (!err) {
+        res.writeHead(200, {
+          "Content-Type": "text/html",
+        }); //write HTML
+        res.write(data); //write data from index.html
+        res.end();
+        return;
+      } else {
+        res.writeHead(404, {
+          "Content-Type": "text/html",
+        });
+        res.end("404 Not Found");
+        return;
+      }
+    });
+  }
+);
 
-//     //openssl req -newkey rsa:2048 -new -nodes -keyout key.pem -out csr.pem
-//     //openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out server.crt
-//     key: fs.readFileSync(__dirname + "/certs/server.key", "utf8"),
-//     cert: fs.readFileSync(__dirname + "/certs/server.crt", "utf8"),
-//   },
-//   httpHandler
-// );
 let io = ioModule(http);
 
 // import { thisClient as client } from "./index.html";
@@ -243,21 +255,3 @@ process.on("SIGINT", function () {
 //-----------------------------------------------------------------------------
 //Functions
 //-----------------------------------------------------------------------------
-function httpHandler(req, res) {
-  fs.readFile(__dirname + "/index.html", function (err, data) {
-    if (!err) {
-      res.writeHead(200, {
-        "Content-Type": "text/html",
-      }); //write HTML
-      res.write(data); //write data from index.html
-      res.end();
-      return;
-    } else {
-      res.writeHead(404, {
-        "Content-Type": "text/html",
-      }); //display 404 on error
-      res.end("404 Not Found");
-      return;
-    }
-  });
-}
