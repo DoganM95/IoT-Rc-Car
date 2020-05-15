@@ -1,5 +1,5 @@
 // const http = require("http").createServer(httpHandler);
-let httpsModule = require("https");
+let https = require("https");
 const fs = require("fs"); //filesystem module
 const ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //socket.io module and pass the http object (server)
 const pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
@@ -15,7 +15,8 @@ try {
 const pigpio = pigpioModule.Gpio;
 
 console.log("dirname: " + __dirname);
-let https = httpsModule.createServer(
+
+https.createServer(
   {
     key: fs.readFileSync(__dirname + "/certs/cert.pem"),
     cert: fs.readFileSync(__dirname + "/certs/key.pem"),
