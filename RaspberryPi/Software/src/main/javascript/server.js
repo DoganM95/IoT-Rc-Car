@@ -40,7 +40,7 @@ let https = httpsModule.createServer(
   }
 );
 
-let io = ioModule(http);
+let io = ioModule(https);
 
 // import { thisClient as client } from "./index.html";
 
@@ -240,7 +240,7 @@ io.sockets.on("connection", function (socket) {
 });
 
 //Server
-http.listen(16207);
+https.listen(16207);
 console.log("waiting for connection on web-interface.");
 
 //Event Listener
