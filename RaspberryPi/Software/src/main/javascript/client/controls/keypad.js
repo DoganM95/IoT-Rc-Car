@@ -1,4 +1,4 @@
-async function keypadHandler(key) {
+async function handleKeydownEvent(key) {
   console.log("Key: " + key.keyCode + " pressed."); //log the pressed key
   switch (
     key.keyCode //switch statement for pressed key
