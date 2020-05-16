@@ -1,6 +1,8 @@
-// const http = require("http").createServer(httpHandler);
-let httpsModule = require("https");
 const fs = require("fs"); //filesystem module
+const httpsModule = require("https");
+const express = require("express");
+const app = express();
+const path = require("path");
 const ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //socket.io module and pass the http object (server)
 const pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
 // let three = require("three"); //https://www.npmjs.com/package/three
@@ -9,37 +11,24 @@ const pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#s
 try {
   pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
 } catch (e) {
+  console.log("Error while setting gpio clock:");
   console.log(e);
 }
-
 const pigpio = pigpioModule.Gpio;
 
-let https = httpsModule.createServer(
+const clientFiles = path.join(__dirname.replace("/server", ""), "client");
+
+app.use(express.static(clientFiles));
+
+const https = httpsModule.createServer(
   {
     key: fs.readFileSync(__dirname + "/certs/key.pem"),
     cert: fs.readFileSync(__dirname + "/certs/cert.pem"),
   },
-  (req, res) => {
-    fs.readFile(__dirname.replace("/server", "/client") + "/index.html", function (err, data) {
-      if (!err) {
-        res.writeHead(200, {
-          "Content-Type": "text/html",
-        }); //write HTML
-        res.write(data); //write data from index.html
-        res.end();
-        return;
-      } else {
-        res.writeHead(404, {
-          "Content-Type": "text/html",
-        });
-        res.end("404 Not Found");
-        return;
-      }
-    });
-  }
+  app
 );
 
-let io = ioModule(https);
+const io = ioModule(https);
 
 // import { thisClient as client } from "./index.html";
 
