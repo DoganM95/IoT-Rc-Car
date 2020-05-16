@@ -35,4 +35,8 @@ async function keypadHandler(key) {
       }
       break;
   }
+
+  //TODO: replace current keys with "w,a,s,d" for precise control and assign arrow keys to static (full value) control
+  // w = 87, a = 65, s = 83, d = 68
+  //up = 38, left = 37, down = 40, right = 39
 }
