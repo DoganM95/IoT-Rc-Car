@@ -243,5 +243,6 @@ function shutDown() {
   console.log("killing server.");
   car.engine.Motors.setSpeed(0);
   car.steering.setDirection(1500);
+  https.close();
   process.exit(0);
 }
