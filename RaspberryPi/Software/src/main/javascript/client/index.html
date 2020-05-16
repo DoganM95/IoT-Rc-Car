@@ -45,8 +45,7 @@
     //Global Vars
     //---------------------------------------------------------------------
     //CONNECTION
-    console.log("From script tag without src");
-    console.log(keypadHandler);
+
     var socket = io(); //load socket.io-client and connect to the host that serves the page
 
     //VARS
@@ -102,6 +101,10 @@
     //---------------------------------------------------------------------
 
     window.addEventListener("load", function () {
+
+      console.log("From script tag without src");
+      console.log(keypadHandler);
+
       const alpha = document.getElementById("alpha");
       const beta = document.getElementById("beta");
       const gamma = document.getElementById("gamma");
