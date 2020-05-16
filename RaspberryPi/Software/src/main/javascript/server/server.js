@@ -205,7 +205,7 @@ io.sockets.on("connection", function (socket) {
     try {
       let axisSettings = JSON.parse(data);
       try {
-        car.controls.axis.set(axisSettings.limits.x, axisSettings.limits.y, axisSettings.deadZones.x, axisLimits.deadZones.y);
+        car.controls.axis.set(axisSettings.limits.x, axisSettings.limits.y, axisSettings.deadZones.x, axisSettings.deadZones.y);
       } catch (e) {
         console.log(e);
       }
