@@ -97,10 +97,6 @@
     //---------------------------------------------------------------------
 
     window.addEventListener("load", function () {
-
-      console.log("From script tag without src");
-      console.log(keypadHandler);
-
       const alpha = document.getElementById("alpha");
       const beta = document.getElementById("beta");
       const gamma = document.getElementById("gamma");
@@ -151,7 +147,11 @@
 
       window.addEventListener(
         "deviceorientation", handleOrientationEvent, true);
+
+      document.addEventListener("keydown", keypadHandler)
     });
+
+
 
     //---------------------------------------------------------------------
     // FUNCTIONS
