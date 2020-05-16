@@ -97,6 +97,7 @@
     //---------------------------------------------------------------------
 
     window.addEventListener("load", function () {
+      //DOM assignments
       const alpha = document.getElementById("alpha");
       const beta = document.getElementById("beta");
       const gamma = document.getElementById("gamma");
@@ -106,14 +107,19 @@
       let servoRightElement = document.getElementById("servoRightButton");
 
       //Socket Emissions
+
       socket.emit("clientAxisSettings", JSON.stringify(thisClient.settings.axis));
 
       //Socket Receives
 
-      window.addEventListener(
-        "deviceorientation", handleOrientationEvent, true);
+      //Event Listeners
 
-      document.addEventListener("keydown", keypadHandler)
+      window.addEventListener(
+        "deviceorientation", handleOrientationEvent, true
+      ); //function handleOrientationEvent contains emitter for orientation states
+
+      document.addEventListener("keydown",
+        handleKeydownEvent) //function handleKeydownEvent contains emitter for keypad inputs
     });
   </script>
 </body>
