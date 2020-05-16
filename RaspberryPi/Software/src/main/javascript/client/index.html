@@ -106,7 +106,6 @@
       let servoRightElement = document.getElementById("servoRightButton");
 
       //Socket Emissions
-      socket.emit("steeringSocket", thisClient.car.steering.angle.value); //initially center servo
       socket.emit("clientAxisSettings", JSON.stringify(thisClient.settings.axis));
 
       //Socket Receives
