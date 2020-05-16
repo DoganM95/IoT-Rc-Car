@@ -109,23 +109,6 @@
       socket.emit("clientAxisSettings", JSON.stringify(thisClient.settings.axis));
 
       //Socket Receives
-      socket.on("motorSpeedSocket", data => {
-        //when motor-speed changes, receive the speed via socket
-        thisClient.car.engine.speed.value =
-          data; //set thisClient.car.engine.speed.value's value to the current speed
-        console.log(
-          "received current thisClient.car.engine.speed.value via socket: " + thisClient.car.engine.speed
-          .value
-        );
-      });
-
-      socket.on("servoAngleSocket", data => {
-        thisClient.car.steering.angle.value = data;
-        console.log(
-          "received current thisClient.car.steering.angle.value via Socket: " + thisClient.car.steering.angle
-          .value
-        );
-      });
 
       window.addEventListener(
         "deviceorientation", handleOrientationEvent, true);
