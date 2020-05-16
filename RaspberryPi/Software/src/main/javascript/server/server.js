@@ -173,6 +173,11 @@ console.log("pwm range of right car.engine: " + car.engine.rightMotor.speed.getP
 console.log("pwm freq of left car.engine: " + car.engine.leftMotor.speed.getPwmFrequency());
 console.log("pwm freq of right car.engine: " + car.engine.rightMotor.speed.getPwmFrequency());
 
+// initially center servo
+car.steering.setDirection(1500);
+// initially set speed 0
+car.engine.Motors.setSpeed(0);
+
 //Server Socket listener
 io.sockets.on("connection", function (socket) {
   //Prologue
