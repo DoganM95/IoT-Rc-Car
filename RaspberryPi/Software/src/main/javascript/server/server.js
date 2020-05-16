@@ -244,5 +244,5 @@ function shutDown() {
   car.engine.Motors.setSpeed(0);
   car.steering.setDirection(1500);
   https.close();
-  process.exit(0);
+  process.exit(0); //TODO: ensure process exit
 }
