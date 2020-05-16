@@ -35,8 +35,10 @@
   <script type="text/javascript" src="/controls/keypad.js">
     // import keypadHandler from "/controls/keypad.js";
     // document.addEventListener("keydown", keypadHandler)
-    console.log("From script tag with src");
-    console.log(keypadHandler);
+    window.addEventListener("load", function () {
+      console.log("From script tag with src");
+      console.log(keypadHandler);
+    });
   </script>
 
 
