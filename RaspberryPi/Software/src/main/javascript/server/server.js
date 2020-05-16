@@ -68,10 +68,10 @@ let car = {
       },
       set: function (limitsX, limitsY, deadZoneX, deadZoneY) {
         //Sanitizes values received from client, uses predefined values if received values are invalid
-        this.limits.x = typeof Number(limitsX) != Number.NaN && 1 < abs(Number(limitsX)) < 90 ? abs(limitsX) : this.limits.x;
-        this.limits.y = typeof Number(limitsY) != Number.NaN && 1 < abs(Number(limitsY)) < 90 ? abs(limitsY) : this.limits.y;
-        this.deadZones.x = typeof Number(deadZoneX) != Number.NaN && 0 <= abs(Number(deadZoneX)) < this.limits.x ? abs(deadZoneX) : this.deadZones.x;
-        this.deadZones.y = typeof Number(deadZoneY) != Number.NaN && 0 <= abs(Number(deadZoneX)) < this.limits.y ? abs(deadZoneX) : this.deadZones.y;
+        this.limits.x = typeof Number(limitsX) != Number.NaN && 1 < Math.abs(Number(limitsX)) < 90 ? Math.abs(limitsX) : this.limits.x;
+        this.limits.y = typeof Number(limitsY) != Number.NaN && 1 < Math.abs(Number(limitsY)) < 90 ? Math.abs(limitsY) : this.limits.y;
+        this.deadZones.x = typeof Number(deadZoneX) != Number.NaN && 0 <= Math.abs(Number(deadZoneX)) < this.limits.x ? Math.abs(deadZoneX) : this.deadZones.x;
+        this.deadZones.y = typeof Number(deadZoneY) != Number.NaN && 0 <= Math.abs(Number(deadZoneX)) < this.limits.y ? Math.abs(deadZoneX) : this.deadZones.y;
         if (Number(limitsX) == Number.NaN || Number(limitsY) == Number.NaN || Number(deadZoneX) == Number.NaN || Number(deadZoneY) == Number.NaN)
           throw new Error(
             "Received invalid axis-values. Falling back to predefined limits: x =" + this.limits.x + ", y = " + this.limits.y + ", deadZone: x = " + this.deadZones.x + ", y = " + this.deadZones.y
