@@ -237,13 +237,14 @@ https.listen(16207);
 console.log("waiting for connection on web-interface.");
 
 //Event Listener
-process.on("SIGINT", function () {
-  //on ctrl+c
+process.on("SIGTERM", shutDown);
+process.on("SIGINT", shutDown);
+function shutDown() {
   console.log("killing server.");
   car.engine.Motors.setSpeed(0);
   car.steering.setDirection(1500);
-  process.exit(); //exit completely
-});
+  process.exit(0);
+}
 
 //-----------------------------------------------------------------------------
 //Functions
