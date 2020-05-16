@@ -45,6 +45,7 @@
     var socket = io(); //load socket.io-client and connect to the host that serves the page
 
     //VARS
+    //TODO: delete semaphore, server should handle the amount of data, not client.
     let semaphore = {
       speed: {
         free: true
@@ -62,32 +63,31 @@
 
     let thisClient = {
       settings: {
-        axisLimits: {
-          left: -30,
-          right: 30,
-          top: 55,
-          bottom: -55,
-          deadzone: {
-            left: 0,
-            right: 0,
-            top: 5,
-            bottom: -5
+        axis: {
+          limits: {
+            x: 50,
+            y: 35
+          },
+          deadZones: {
+            x: 0,
+            y: 5
           }
         }
       },
       car: {
         engine: {
           speed: {
-            value: 0, //Stop motor initially
+            value: 0,
             increment: 5
-          }
+          },
+          invert: false
         },
         steering: {
           angle: {
-            value: 1500, //Center position initially
+            value: 1500,
             increment: 10
           },
-          invert: true
+          invert: false
         }
       }
     };
@@ -107,7 +107,7 @@
 
       //Socket Emissions
       socket.emit("steeringSocket", thisClient.car.steering.angle.value); //initially center servo
-      socket.emit("axisLimits", thisClient.settings.axisLimits);
+      socket.emit("clientAxisSettings", JSON.stringify(thisClient.settings.axis));
 
       //Socket Receives
       socket.on("motorSpeedSocket", data => {
