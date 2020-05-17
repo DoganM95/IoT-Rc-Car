@@ -63,31 +63,49 @@
 
     let thisClient = {
       settings: {
-        axis: {
-          limits: {
-            x: 50,
-            y: 35
+        controls: {
+          axis: {
+            limits: {
+              x: 50,
+              y: 35
+            },
+            deadZones: {
+              x: 0,
+              y: 5
+            }
           },
-          deadZones: {
-            x: 0,
-            y: 5
+          keypad: {
+            limits: {
+              x: {
+                min: 500,
+                max: 2500
+              },
+              y: {
+                min: 0,
+                max: 255
+              }
+            }
           }
         }
       },
       car: {
         engine: {
-          speed: {
-            value: 0,
-            increment: 5
-          },
-          invert: false
+          motors: {
+            speed: {
+              value: 0,
+              increment: 5
+            },
+            invert: false
+          }
         },
         steering: {
-          angle: {
-            value: 1500,
-            increment: 10
-          },
-          invert: false
+          servos: {
+            angle: {
+              value: 1500,
+              increment: 10
+            },
+            invert: false
+          }
         }
       }
     };
