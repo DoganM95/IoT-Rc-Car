@@ -64,25 +64,33 @@
     let thisClient = {
       settings: {
         controls: {
+          //TODO: receive physical limits and adjust range
           axis: {
-            limits: {
-              x: 50,
-              y: 35
+            range: {
+              x: {
+                bounds: 50,
+                precision: 0
+              },
+              y: {
+                bounds: 35,
+                precision: 0
+              }
             },
             deadZones: {
               x: 0,
               y: 5
-            }
+            },
+
           },
           keypad: {
-            limits: {
+            range: {
               x: {
-                min: 500,
-                max: 2500
+                bounds: 1000,
+                increment: 10
               },
               y: {
-                min: 0,
-                max: 255
+                bounds: 1000,
+                increment: 10
               }
             }
           }
@@ -92,19 +100,15 @@
         engine: {
           motors: {
             speed: {
-              value: 0,
-              increment: 5
+              value: 0
             },
-            invert: false
           }
         },
         steering: {
           servos: {
-            angle: {
-              value: 1500,
-              increment: 10
-            },
-            invert: false
+            direction: {
+              value: 0
+            }
           }
         }
       }
@@ -126,7 +130,8 @@
 
       //Socket Emissions
 
-      socket.emit("clientAxisSettings", JSON.stringify(thisClient.settings.axis));
+      socket.emit("clientAxisSettings", JSON.stringify(thisClient.settings.controls.axis));
+      socket.emit("clientKeypadSettings", JSON.stringify(thisClient.settings.controls.keypad));
 
       //Socket Receives
 
@@ -137,7 +142,13 @@
       ); //function handleOrientationEvent contains emitter for orientation states
 
       document.addEventListener("keydown",
-        handleKeydownEvent) //function handleKeydownEvent contains emitter for keypad inputs
+        handleKeydownEventPreciseControl) //function contains emitter for keypad inputs
+
+      document.addEventListener("keydown",
+        handleKeydownEventRoughControl) //function contains emitter for keypad inputs
+
+      document.addEventListener("keyup",
+        handleKeyupEventRoughControl) //function contains emitter for keypad inputs
     });
   </script>
 </body>
