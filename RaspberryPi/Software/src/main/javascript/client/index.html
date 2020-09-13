@@ -1,0 +1,156 @@
+<html>
+
+<head>
+  <link rel="manifest" href="manifest.json" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/101/three.min.js"></script>
+  <!-- include socket.io client side script -->
+  <script type="text/javascript" src="/controls/keypad.js"></script>
+  <script type="text/javascript" src="/controls/orientation.js"></script>
+</head>
+
+<body>
+  <div id="sensors">
+    <h3 id="gamma">Gamma</h3><br />
+    <h3 id="beta">Beta</h3><br />
+    <h3 id="alpha">Alpha</h3><br />
+    <h3 id="absolute">Absolute</h3>
+  </div>
+  <br /><br />
+  <div id="data">
+    <p>Motor Speed by orientation:</p>
+    <p id="motor-speed-orientation"></p>
+    <p>Motor Speed in km/h:</p>
+    <p id="motor-speed-kmh"></p>
+    <p>Motor Direction:</p>
+    <p id="motor-direction"></p>
+    <br />
+    <p>Steering Angle by orientation:</p>
+    <p id="steering-angle-orientation"></p>
+    <p>Steering Angle by degrees:</p>
+    <p id="steering-angle-degrees"></p>
+    <p>Steering Requests per Second:</p>
+    <p id="steering-angle"></p>
+  </div>
+
+
+
+
+
+  <script>
+    //---------------------------------------------------------------------
+    //Global Vars
+    //---------------------------------------------------------------------
+
+    var socket = io(); //load socket.io-client and connect to the host that serves the page
+
+    //VARS
+    //TODO: delete semaphore, server should handle the amount of data, not client.
+    let semaphore = {
+      speed: {
+        free: true
+      },
+      steering: {
+        free: true
+      },
+      key: {
+        left: true,
+        right: true,
+        up: true,
+        down: true
+      }
+    };
+
+    let thisClient = {
+      settings: {
+        controls: {
+          //TODO: receive physical limits and adjust range
+          axis: {
+            range: {
+              x: {
+                bounds: 50,
+                precision: 0
+              },
+              y: {
+                bounds: 35,
+                precision: 0
+              }
+            },
+            deadZones: {
+              x: 0,
+              y: 5
+            },
+
+          },
+          keypad: {
+            range: {
+              x: {
+                bounds: 1000,
+                increment: 10
+              },
+              y: {
+                bounds: 1000,
+                increment: 10
+              }
+            }
+          }
+        }
+      },
+      car: {
+        engine: {
+          motors: {
+            speed: {
+              value: 0
+            },
+          }
+        },
+        steering: {
+          servos: {
+            direction: {
+              value: 0
+            }
+          }
+        }
+      }
+    };
+
+    //---------------------------------------------------------------------
+    // MAIN
+    //---------------------------------------------------------------------
+
+    window.addEventListener("load", function () {
+      //DOM assignments
+      const alpha = document.getElementById("alpha");
+      const beta = document.getElementById("beta");
+      const gamma = document.getElementById("gamma");
+      const absolute = document.getElementById("absolute");
+      let motor = document.getElementById("motorState");
+      let servoLeftElement = document.getElementById("servoLeftButton");
+      let servoRightElement = document.getElementById("servoRightButton");
+
+      //Socket Emissions
+
+      socket.emit("clientAxisSettings", JSON.stringify(thisClient.settings.controls.axis));
+      socket.emit("clientKeypadSettings", JSON.stringify(thisClient.settings.controls.keypad));
+
+      //Socket Receives
+
+      //Event Listeners
+
+      window.addEventListener(
+        "deviceorientation", handleOrientationEvent, true
+      ); //function handleOrientationEvent contains emitter for orientation states
+
+      document.addEventListener("keydown",
+        handleKeydownEventPreciseControl) //function contains emitter for keypad inputs
+
+      document.addEventListener("keydown",
+        handleKeydownEventRoughControl) //function contains emitter for keypad inputs
+
+      document.addEventListener("keyup",
+        handleKeyupEventRoughControl) //function contains emitter for keypad inputs
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,6 @@
+.vscode
+**/certs
+**/node_modules
+**/credentials.json
+**/configuration.json
+**/logs
