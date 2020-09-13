@@ -7,9 +7,12 @@ const ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io
 const pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
 // let three = require("three"); //https://www.npmjs.com/package/three
 
+//-----------------------------------------------------------------------------
 // Module configs
+//-----------------------------------------------------------------------------
+
 try {
-  pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM);
+  pigpioModule.configureClock(2, pigpioModule.CLOCK_PCM); //Sets PwmFrequency to 2 micro seonds (see table in pigpio docs)
 } catch (e) {
   console.log("Error while setting gpio clock:");
   console.log(e);
@@ -35,8 +38,134 @@ const io = ioModule(https);
 //-----------------------------------------------------------------------------
 
 let client = {
+  //TODO: cleanup
   identity: undefined,
   settings: {
+    controls: {
+      axis: {
+        sockets: {
+          x: {
+            //TODO: fix
+            set: function (data) {
+              let dataAsNum = Number(data);
+              if (Number.isFinite(dataAsNum)) {
+                if (Math.abs(dataAsNum) <= client.settings.controls.axis.bounds.x) {
+                  car.steering.servos.setDirection(data);
+                } else {
+                  //Bounds exceeded
+                  if (dataAsNum < -client.settings.controls.axis.bounds.x) car.steering.servos;
+                }
+              } else {
+                car.steering.servos.setDirection(0);
+              }
+            },
+          },
+          y: {
+            //TODO: fix
+            set: function (data) {
+              let dataAsNum = Number(data);
+              if (Number.isFinite(dataAsNum) && client.settings.controls.axis.bounds.y <= Math.abs(dataAsNum)) {
+                if (dataAsNum < 0) car.engine.motors;
+              } else car.steering.servos.setDirection(0);
+            },
+          },
+        },
+        range: {
+          x: {
+            bounds: 50,
+            deadZones: 0,
+            precision: 0,
+          },
+          y: {
+            bounds: 30,
+            deadZones: 5,
+            precision: 0,
+          },
+        },
+        configure: function (boundsX, boundsY, deadZoneX, deadZoneY) {
+          //Sanitizes values received from client, uses predefined values if received values are invalid
+          parseInt();
+          this.range.x.bounds = Number(boundsX) != Number.NaN && 1 < Math.abs(Number(boundsX)) < 90 ? Math.abs(boundsX) : this.range.x.bounds;
+          this.range.y = Number(boundsY) != Number.NaN && 1 < Math.abs(Number(boundsY)) < 90 ? Math.abs(boundsY) : this.range.y;
+          this.range.x.deadZoness = Number(deadZoneX) != Number.NaN && 0 <= Math.abs(Number(deadZoneX)) < this.range.x.bounds ? Math.abs(deadZoneX) : this.range.x.deadZones;
+          this.range.y.deadZones = Number(deadZoneY) != Number.NaN && 0 <= Math.abs(Number(deadZoneX)) < this.range.y ? Math.abs(deadZoneX) : this.range.y.deadZones;
+          if (Number(boundsX) == Number.NaN || Number(boundsY) == Number.NaN || Number(deadZoneX) == Number.NaN || Number(deadZoneY) == Number.NaN)
+            throw new Error(
+              "Received invalid axis-values. Falling back to predefined bounds: x =" +
+                this.range.x.bounds +
+                ", y = " +
+                this.range.y +
+                ", deadZone: x = " +
+                this.range.x.deadZones +
+                ", y = " +
+                this.range.y.deadZones
+            );
+        },
+        transmissionMode: {
+          mode: {
+            //TODO: Implement usage
+            continuously: false,
+            onChangeOnly: true,
+          },
+        },
+      },
+      keypad: {
+        sockets: {
+          x: {
+            set: function (data) {
+              let dataAsNum = Number(data);
+              if (Number.isInteger(dataAsNum)) {
+                dataAsNum = Math.abs(dataAsNum);
+                if (Math.abs(dataAsNum)) {
+                  car.steering.servos.setDirection(data);
+                } else {
+                  //Bounds exceeded
+                  if (dataAsNum < -client.settings.controls.axis.bounds.x) car.steering.servos;
+                }
+              } else {
+                car.steering.servos.setDirection(0);
+              }
+            },
+          },
+        },
+        range: {
+          x: {
+            bounds: 1000,
+            increment: 1000 / 100,
+          },
+          y: {
+            bounds: 20000,
+            increment: 20000 / 100,
+          },
+          setBounds: function (boundsX, boundsY, incrementX, incrementY) {
+            //Sanitizes values received from client, uses predefined values if received values are invalid
+            client.settings.controls.keypad.range.x.bounds =
+              Number(boundsX) != Number.NaN && Number(boundsX) <= car.steering.servos.limits.max - car.steering.servos.limits.min / 2
+                ? Number(boundsX)
+                : car.steering.servos.limits.max - car.steering.servos.limits.min / 2;
+
+            client.settings.controls.keypad.range.y.bounds = Number(boundsY) != Number.NaN && Number(boundsY) <= car.engine.motors.limits ? Number(boundsY) : car.engine.motors.limits;
+
+            client.settings.controls.keypad.range.x.increment =
+              Number(incrementX) != Number.NaN && Number(incrementX) <= car.steering.servos.limits.max - car.steering.servos.limits.min / 2
+                ? Number(incrementX)
+                : car.steering.servos.limits.max - car.steering.servos.limits.min / 2 / 100;
+
+            client.settings.controls.keypad.range.y.increment =
+              Number(incrementY) != Number.NaN && Number(incrementY) <= car.engine.motors.limits ? Number(incrementY) : car.engine.motors.limits / 100;
+          },
+        },
+      },
+
+      multipleSimultaneousClientsAllowed: false,
+      offsets: {
+        //TODO: implement usage
+        x: {
+          leftServo: 0,
+          rightServo: 0,
+        },
+      },
+    },
     engine: {},
     steering: {
       leftServoOffset: 0,
@@ -56,124 +185,130 @@ let client = {
 };
 
 let car = {
-  controls: {
-    axis: {
-      deadZones: {
-        x: 0,
-        y: 5,
-      },
-      limits: {
-        x: 50,
-        y: 30,
-      },
-      set: function (limitsX, limitsY, deadZoneX, deadZoneY) {
-        //Sanitizes values received from client, uses predefined values if received values are invalid
-        this.limits.x = typeof Number(limitsX) != Number.NaN && 1 < Math.abs(Number(limitsX)) < 90 ? Math.abs(limitsX) : this.limits.x;
-        this.limits.y = typeof Number(limitsY) != Number.NaN && 1 < Math.abs(Number(limitsY)) < 90 ? Math.abs(limitsY) : this.limits.y;
-        this.deadZones.x = typeof Number(deadZoneX) != Number.NaN && 0 <= Math.abs(Number(deadZoneX)) < this.limits.x ? Math.abs(deadZoneX) : this.deadZones.x;
-        this.deadZones.y = typeof Number(deadZoneY) != Number.NaN && 0 <= Math.abs(Number(deadZoneX)) < this.limits.y ? Math.abs(deadZoneX) : this.deadZones.y;
-        if (Number(limitsX) == Number.NaN || Number(limitsY) == Number.NaN || Number(deadZoneX) == Number.NaN || Number(deadZoneY) == Number.NaN)
-          throw new Error(
-            "Received invalid axis-values. Falling back to predefined limits: x =" + this.limits.x + ", y = " + this.limits.y + ", deadZone: x = " + this.deadZones.x + ", y = " + this.deadZones.y
-          );
-      },
-    },
+  init: function () {
+    car.engine.motors.setPwmFrequency(this.engine.motors.pwmFrequency);
+    car.engine.motors.setPwmRange(this.engine.motors.pwmFrequency);
+    console.log("pwm range of left motor: " + car.engine.motors.left.speed.getPwmRange());
+    console.log("pwm range of right motor: " + car.engine.motors.right.speed.getPwmRange());
+    console.log("pwm freq of left motor: " + car.engine.motors.left.speed.getPwmFrequency());
+    console.log("pwm freq of right motor: " + car.engine.motors.right.speed.getPwmFrequency());
+    car.steering.servos.setDirection(1500); // Initial steering state
+    car.engine.motors.setSpeed(0); // Initial engine state
   },
   engine: {
-    leftMotor: {
-      backward: new pigpio(19, {
-        mode: pigpio.OUTPUT,
-      }),
-      forward: new pigpio(26, {
-        mode: pigpio.OUTPUT,
-      }),
-      setBackward: function () {
-        this.forward.digitalWrite(0);
-        this.backward.digitalWrite(1);
-      },
-      setForward: function () {
-        this.forward.digitalWrite(1);
-        this.backward.digitalWrite(0);
-      },
-      setSpeed: function (speed) {
-        this.speed.pwmWrite(Math.abs(Math.round(speed)));
-      },
-      speed: new pigpio(21, {
-        mode: pigpio.OUTPUT,
-      }),
-    },
     motors: {
+      limits: 20000,
+      pwmFrequency: 20000,
       getPwmFrequency: function () {
-        return (car.engine.leftMotor.speed.getPwmFrequency() + car.engine.rightMotor.speed.getPwmFrequency()) / 2;
+        return (this.left.speed.getPwmFrequency() + this.right.speed.getPwmFrequency()) / 2;
       },
       getPwmRange: function () {
-        return (car.engine.leftMotor.speed.getPwmRange() + car.engine.rightMotor.speed.getPwmRange()) / 2;
+        return (this.left.speed.getPwmRange() + this.right.speed.getPwmRange()) / 2;
       },
       getSpeed: function () {
-        return (car.engine.leftMotor.speed.getPwmDutyCycle() + car.engine.rightMotor.speed.getPwmDutyCycle()) / 2;
+        return (this.left.speed.getPwmDutyCycle() + this.right.speed.getPwmDutyCycle()) / 2;
       },
-      getSpeed: function () {
-        return (car.engine.leftMotor.speed.getPwmDutyCycle() + car.engine.rightMotor.speed.getPwmDutyCycle()) / 2;
+      setPwmRange: function (pwmRange) {
+        this.left.speed.pwmRange(pwmRange);
+        this.right.speed.pwmRange(pwmRange);
       },
       setBackward: function () {
-        car.engine.leftMotor.forward.digitalWrite(0);
-        car.engine.rightMotor.forward.digitalWrite(0);
-        car.engine.rightMotor.backward.digitalWrite(1);
-        car.engine.leftMotor.backward.digitalWrite(1);
+        this.left.forward.digitalWrite(0);
+        this.right.forward.digitalWrite(0);
+        this.right.backward.digitalWrite(1);
+        this.left.backward.digitalWrite(1);
       },
       setForward: function () {
-        car.engine.rightMotor.forward.digitalWrite(1);
-        car.engine.leftMotor.forward.digitalWrite(1);
-        car.engine.rightMotor.backward.digitalWrite(0);
-        car.engine.leftMotor.backward.digitalWrite(0);
+        this.right.forward.digitalWrite(1);
+        this.left.forward.digitalWrite(1);
+        this.right.backward.digitalWrite(0);
+        this.left.backward.digitalWrite(0);
       },
       setPwmFrequency: function (hertz) {
-        car.engine.leftMotor.speed.pwmFrequency(hertz);
-        car.engine.rightMotor.speed.pwmFrequency(hertz);
+        this.left.speed.pwmFrequency(hertz);
+        this.right.speed.pwmFrequency(hertz);
       },
-      setSpeed: function (speed) {
-        car.engine.leftMotor.setSpeed(speed);
-        car.engine.rightMotor.setSpeed(speed);
+      setSpeed: function (pwmDutyCycle) {
+        this.left.setSpeed(pwmDutyCycle);
+        this.right.setSpeed(pwmDutyCycle);
       },
-    },
-    rightMotor: {
-      backward: new pigpio(6, {
-        mode: pigpio.OUTPUT,
-      }),
-      forward: new pigpio(13, {
-        mode: pigpio.OUTPUT,
-      }),
-      setBackward: function () {
-        this.forward.digitalWrite(0);
-        this.backward.digitalWrite(1);
+      left: {
+        backward: new pigpio(19, {
+          mode: pigpio.OUTPUT,
+        }),
+        forward: new pigpio(26, {
+          mode: pigpio.OUTPUT,
+        }),
+        setBackward: function () {
+          this.forward.digitalWrite(0);
+          this.backward.digitalWrite(1);
+        },
+        setForward: function () {
+          this.forward.digitalWrite(1);
+          this.backward.digitalWrite(0);
+        },
+        setSpeed: function (pwmDutyCycle) {
+          this.speed.pwmWrite(Math.abs(Math.round(pwmDutyCycle)));
+        },
+        speed: new pigpio(21, {
+          mode: pigpio.OUTPUT,
+        }),
       },
-      setForward: function () {
-        this.forward.digitalWrite(1);
-        this.backward.digitalWrite(0);
+      right: {
+        backward: new pigpio(6, {
+          mode: pigpio.OUTPUT,
+        }),
+        forward: new pigpio(13, {
+          mode: pigpio.OUTPUT,
+        }),
+        setBackward: function () {
+          this.forward.digitalWrite(0);
+          this.backward.digitalWrite(1);
+        },
+        setForward: function () {
+          this.forward.digitalWrite(1);
+          this.backward.digitalWrite(0);
+        },
+        setSpeed: function (pwmDutyCycle) {
+          this.speed.pwmWrite(Math.abs(Math.round(pwmDutyCycle)));
+        },
+        speed: new pigpio(20, {
+          mode: pigpio.OUTPUT,
+        }),
       },
-      setSpeed: function (speed) {
-        this.speed.pwmWrite(Math.abs(Math.round(speed)));
-      },
-      speed: new pigpio(20, {
-        mode: pigpio.OUTPUT,
-      }),
     },
   },
   sensors: {
+    //TODO: implement usage
     distance: undefined,
     speed: undefined,
   },
   steering: {
-    leftServo: new pigpio(23, {
-      mode: pigpio.OUTPUT,
-    }),
-    rightServo: new pigpio(24, {
-      mode: pigpio.OUTPUT,
-    }),
-    setDirection: function (angle) {
-      //Syncing algorithm goes here
-      this.leftServo.servoWrite(angle);
-      this.rightServo.servoWrite(angle);
+    servos: {
+      limits: {
+        // Change to adjust max steering angle
+        min: 500,
+        max: 2500,
+      },
+      left: {
+        pin: new pigpio(23, {
+          mode: pigpio.OUTPUT,
+        }),
+        offset: 0,
+      },
+
+      right: {
+        pin: new pigpio(24, {
+          mode: pigpio.OUTPUT,
+        }),
+        offset: 0,
+      },
+
+      setDirection: function (pulseWidth) {
+        //Syncing algorithm goes here
+        this.left.servoWrite(pulseWidth);
+        this.right.servoWrite(pulseWidth);
+      },
     },
   },
 };
@@ -182,30 +317,22 @@ let car = {
 //Main
 //-----------------------------------------------------------------------------
 
-car.engine.motors.setPwmFrequency(20000);
-console.log("Server Running.");
-console.log("pwm range of left motor: " + car.engine.leftMotor.speed.getPwmRange());
-console.log("pwm range of right motor: " + car.engine.rightMotor.speed.getPwmRange());
-console.log("pwm freq of left motor: " + car.engine.leftMotor.speed.getPwmFrequency());
-console.log("pwm freq of right motor: " + car.engine.rightMotor.speed.getPwmFrequency());
-
-// Initial car state
-car.steering.setDirection(1500);
-car.engine.motors.setSpeed(0);
+car.init();
 
 //Server Socket listener
 io.sockets.on("connection", function (socket) {
   //Prologue
   client.identity = socket.client;
-  console.log("Connected: " + client.identity.conn.remoteAddress + " - " + new Date().toUTCString());
+  console.log("Connected: " + client.identity.conn.remoteAddress.replace("::fff:", "") + " - " + new Date().toUTCString());
 
+  //TODO: adapt to new object model
   //Listeners
   socket.on("clientAxisSettings", (data) => {
     console.log("Client Axis Settings: \n" + data);
     try {
       let axisSettings = JSON.parse(data);
       try {
-        car.controls.axis.set(axisSettings.limits.x, axisSettings.limits.y, axisSettings.deadZones.x, axisSettings.deadZones.y);
+        client.settings.controls.axis.configure(axisSettings.bounds.x, axisSettings.bounds.y, axisSettings.deadZones.x, axisSettings.deadZones.y);
       } catch (e) {
         console.log(e);
       }
@@ -215,6 +342,26 @@ io.sockets.on("connection", function (socket) {
     }
   });
 
+  //TODO: implement
+  socket.on("clientAxisSettings", (data) => {
+    console.log("Client Keypad Settings: \n" + data);
+    try {
+      let keypadSettings = JSON.parse(data);
+      try {
+        client.settings.controls.keypad.setBounds(axisSettings.bounds.x, axisSettings.bounds.y, axisSettings.deadZones.x, axisSettings.deadZones.y);
+      } catch (e) {
+        console.log(e);
+      }
+    } catch (e) {
+      console.log("Error parsing settings:");
+      console.log(e);
+    }
+  });
+
+  //TODO: control_engine_by_keypad
+  socket.on("control_engine_by_keypad", (data) => {});
+
+  //TODO: cleanup
   socket.on("engineSocket", (gamma) => {
     console.log("speed-angle: " + gamma.angle);
     client.state.sensors.deviceorientation.gamma = gamma.angle;
@@ -246,11 +393,14 @@ io.sockets.on("connection", function (socket) {
       console.log(e);
     }
   });
-
+  //TODO: check
   socket.on("steeringSocket", (data) => {
-    car.steering.setDirection(data);
-    socket.emit("servoSocket", (car.steering.leftServo.getServoPulseWidth() + car.steering.rightServo.getServoPulseWidth()) / 2);
+    car.steering.servos.setDirection(data);
+    // socket.emit("servoSocket", (car.steering.servos.left.getServoPulseWidth() + car.steering.servos.right.getServoPulseWidth()) / 2);
   });
+
+  //NEW variants:
+  socket.on("control_engine_by_keypad", (data) => {});
 });
 
 //Server
@@ -263,7 +413,7 @@ process.on("SIGINT", shutDown);
 function shutDown() {
   console.log("killing server.");
   car.engine.motors.setSpeed(0);
-  car.steering.setDirection(1500);
+  car.steering.servos.setDirection(1500);
   https.close();
   app.removeAllListeners();
   app.disable();
