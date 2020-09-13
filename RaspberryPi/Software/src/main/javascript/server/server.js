@@ -1,14 +1,13 @@
-const fs = require("fs"); //filesystem module
+const fs = require("fs");
 const httpsModule = require("https");
 const express = require("express");
 const app = express();
 const path = require("path");
-const ioModule = require("socket.io"); //https://www.npmjs.com/package/socket.io //socket.io module and pass the http object (server)
-const pigpioModule = require("pigpio"); //https://www.npmjs.com/package/pigpio#servo-control //pigpio to enable pulse width modulation
-// let three = require("three"); //https://www.npmjs.com/package/three
+const ioModule = require("socket.io");
+const pigpioModule = require("pigpio");
 
 //-----------------------------------------------------------------------------
-// Module configs
+// Module configurations
 //-----------------------------------------------------------------------------
 
 try {
