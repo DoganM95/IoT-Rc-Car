@@ -14,6 +14,7 @@ if [ ! $(git fetch --all) ]; then
     exit
 fi
 git checkout $workingBranch
+cd "$sourceCodePath/javascript"
 npm start
 # echo $(Timestamp) >> "${projectPath}/.../ran.txt"
 
