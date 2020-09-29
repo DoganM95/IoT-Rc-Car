@@ -17,6 +17,8 @@ currentTime=""
 # fi
 git checkout $workingBranch
 cd "$sourceCodePath/javascript"
+npm install
+npm update
 npm start
 # echo $(Timestamp) >> "${projectPath}/.../ran.txt"
 
