@@ -2,7 +2,7 @@
 This project is intended to host a node.js app on a raspberry pi  which replaces the stock internals of a Lego RC car and controls it over http protocol. The car which this was build in is LEGO Racers 8676.
 
 
-# Setting up a Raspberry Pi (Headless!)
+# Setting up the Raspberry Pi headless
 1. Install "Raspbian Lite" on micro-sd card using either "BalenaEtcher" (portable) or "Raspberry Pi Imager" (needs installation)
 2. Navigate to "boot" drive, create a new empty file and rename it to `ssh`
 3. Create a new file, name it `wpa_supplicant.conf` and edit its content to the following:
