@@ -17,7 +17,7 @@ readonly sourceCodePath="$softwarePath/src/main"
 readonly projectRepository="https://github.com/DoganM95/IoT-Rc-Car.git"
 
 # Git settings
-readonly workingBranch="dev"
+readonly workingBranch="master"
 
 # Log Settings
 readonly maxLogLines=1000
