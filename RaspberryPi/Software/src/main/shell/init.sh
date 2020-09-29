@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Load config file
 . ./config.sh

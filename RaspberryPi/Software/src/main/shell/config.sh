@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Definition of general stuff
 readonly terminalSessionName="rc-car"
