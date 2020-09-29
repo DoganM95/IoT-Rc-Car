@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Load configuration file
 . ./config.sh
 
