@@ -10,11 +10,11 @@ Timestamp() {
 
 currentTime=""
 
-cd $projectPath
-if [ ! $(git fetch --all) ]; then
-    echo "Run initialize.sh first or clone your repository manually."
-    exit
-fi
+# cd $projectPath
+# if [ ! $(git fetch --all) ]; then
+#     echo "Run initialize.sh first or clone your repository manually."
+#     exit
+# fi
 git checkout $workingBranch
 cd "$sourceCodePath/javascript"
 npm start
