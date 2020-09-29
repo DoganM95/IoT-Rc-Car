@@ -305,8 +305,8 @@ let car = {
 
       setDirection: function (pulseWidth) {
         //Syncing algorithm goes here
-        this.left.servoWrite(pulseWidth);
-        this.right.servoWrite(pulseWidth);
+        this.left.pin.servoWrite(pulseWidth);
+        this.right.pin.servoWrite(pulseWidth);
       },
     },
   },
