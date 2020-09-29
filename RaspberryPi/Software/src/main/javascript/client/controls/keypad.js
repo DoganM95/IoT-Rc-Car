@@ -35,7 +35,7 @@ async function handleKeydownEventPreciseControl(key) {
   }
 }
 
-async function handleKeydownEventRoughControl() {
+async function handleKeydownEventRoughControl(key) {
   console.log("Key: " + key.keyCode + " down.");
   switch (key.keyCode) {
     //Rough Control: up = 38, left = 37, down = 40, right = 39
@@ -59,13 +59,13 @@ async function handleKeydownEventRoughControl() {
   }
 }
 
-async function handleKeyupEventRoughControl() {
+async function handleKeyupEventRoughControl(key) {
   console.log("Key: " + key.keyCode + " up.");
   switch (key.keyCode) {
     //Rough Control: up = 38, left = 37, down = 40, right = 39
 
     case 38: //key up, stopping
-    thisClient.car.steering.servos.direction.value = thisClient.settings.controls.keypad.range.x.bounds
+      thisClient.car.steering.servos.direction.value = thisClient.settings.controls.keypad.range.x.bounds;
       socket.emit("control_engine_by_keypad", 0);
       break;
     case 40: //key down, stopping
