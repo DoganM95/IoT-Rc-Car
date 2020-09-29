@@ -2,7 +2,7 @@
 . ./config.sh
 
 # Definition script functions and vars
-function Timestamp() {
+Timestamp() {
     date +"%T"
 }
 
