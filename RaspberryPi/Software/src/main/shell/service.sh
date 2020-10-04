@@ -19,14 +19,10 @@ git checkout $workingBranch
 cd "$sourceCodePath/javascript"
 npm install
 npm update
+killall node && echo "killed any running node process"
+killall pigpiod && echo "killed pigpio deamon"
 npm start
 # echo $(Timestamp) >> "${projectPath}/.../ran.txt"
-
-# sudo npm start &
-# sudo npm run $NPMRUN &
-
-# zenity --info --text "Startet Server" &
-# xterm -e 'bash -c "echo server is up; sleep 10"' &>/dev/null &
 
 while true; do
     currentTime=$(Timestamp)
@@ -50,7 +46,7 @@ while true; do
 
     elif [ $REMOTE = $BASE ]; then
         echo $currentTime " - Local project folder has changes to push. "
-        git reset --hard origin/$workingBranch # revert changes to be able to pull
+        git reset --hard # origin/$workingBranch # revert changes to be able to pull
         git pull
         # chown -R pi $projectPath
         # chmod -R +rwx $projectPath
