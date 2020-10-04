@@ -27,8 +27,7 @@
   },
   "scripts": {
     "start": "sudo node /home/pi/project/RaspberryPi/Software/src/main/javascript/server/server.js &",
-    "serve": "sudo /home/pi/project/RaspberryPi/Software/src/main/shell/service.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "sudo chmod +rwx /home/pi/project/RaspberryPi/Software/src/main/shell/* && sudo /home/pi/project/RaspberryPi/Software/src/main/shell/service.sh"
   },
   "version": "1.0.0"
 }
