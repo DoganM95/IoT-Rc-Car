@@ -3,4 +3,4 @@ update_configs:
   - package_manager: "javascript"
     directory: "/RaspberryPi/Software/src/main/javascript/"
     update_schedule: "daily"
-    target_branch: "develop"
+    target_branch: "master"
