@@ -13,7 +13,7 @@
     "path": "^0.12.7",
     "pigpio": "^3.2.3",
     "socket.io": "^2.4.0",
-    "three": "^0.125.0"
+    "three": "^0.137.0"
   },
   "description": "",
   "devDependencies": {},
